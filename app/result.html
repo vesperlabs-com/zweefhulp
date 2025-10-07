@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultaten - Zweefhulp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Header with Search -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center gap-6">
+                <!-- Logo -->
+                <a href="index.html" class="text-2xl font-bold text-gray-800 hover:text-gray-600 transition-colors whitespace-nowrap">
+                    Zweef<span class="text-blue-600">hulp</span>
+                </a>
+                
+                <!-- Search Bar -->
+                <form id="searchForm" class="flex-grow max-w-full">
+                    <div class="flex items-center border border-gray-300 rounded-full px-4 py-2 hover:shadow-sm transition-shadow focus-within:shadow-sm bg-white">
+                        <svg class="w-4 h-4 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="Zoek in verkiezingsprogramma's..."
+                            class="flex-grow outline-none text-gray-700 text-sm"
+                            autocomplete="off"
+                        >
+                    </div>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-4 py-8">
+        
+        <!-- Search Query Display -->
+        <div class="mb-8">
+            <p class="text-sm text-gray-600 mb-1">Zoekresultaten voor</p>
+            <h1 id="searchQuery" class="text-3xl font-normal text-gray-800"></h1>
+        </div>
+
+        <!-- Frequency Chart -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+            <h2 class="text-lg font-medium text-gray-800 mb-6">Frequentie van vermeldingen</h2>
+            
+            <div class="flex items-end justify-start gap-3 overflow-x-auto pb-2 pt-2" style="height: 360px;" id="chartContainer">
+                <!-- Chart bars will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Party Results -->
+        <div class="space-y-6" id="partyResults">
+            <!-- Party cards will be inserted here by JavaScript -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full py-4 border-t border-gray-100 mt-8">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-gray-500">
+            <p>Een initiatief van <a href="https://gaal.co" class="text-blue-600 hover:text-blue-700" target="_blank">Robert Gaal</a> en <a href="https://stefanborsje.com/" class="text-blue-600 hover:text-blue-700" target="_blank">Stefan Borsje</a></p>
+            <div class="flex gap-3">
+                <a href="https://github.com/vesperlabs-com/zweefhulp" class="text-blue-600 hover:text-blue-700" target="_blank">Broncode</a>
+                <span>•</span>
+                <a href="mailto:robert@gaal.co" class="text-blue-600 hover:text-blue-700">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Get search query from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('q') || '';
+        document.getElementById('searchQuery').textContent = query;
+        document.getElementById('searchInput').value = query;
+
+        // Mock data for all search terms
+        const mockData = [
+            { party: '50PLUS', short: '50+', count: 3, website: 'https://50pluspartij.nl' },
+            { party: 'BBB', short: 'BBB', count: 8, website: 'https://www.boerburgerbeweging.nl' },
+            { party: 'BIJ1', short: 'BIJ1', count: 12, website: 'https://bij1.org' },
+            { party: 'BVNL', short: 'BVNL', count: 5, website: 'https://bvnl.nl' },
+            { party: 'CDA', short: 'CDA', count: 15, website: 'https://www.cda.nl' },
+            { party: 'ChristenUnie', short: 'CU', count: 9, website: 'https://www.christenunie.nl' },
+            { party: 'D66', short: 'D66', count: 18, website: 'https://d66.nl' },
+            { party: 'DENK', short: 'DENK', count: 7, website: 'https://bewegingdenk.nl' },
+            { party: 'FvD', short: 'FvD', count: 4, website: 'https://www.fvd.nl' },
+            { party: 'GroenLinks-PvdA', short: 'GL-PvdA', count: 22, website: 'https://groenlinks-pvda.nl' },
+            { party: 'JA21', short: 'JA21', count: 6, website: 'https://ja21.nl' },
+            { party: 'NSC', short: 'NSC', count: 11, website: 'https://www.nieuwsociaalcontract.nl' },
+            { party: 'Partij voor de Dieren', short: 'PvdD', count: 14, website: 'https://www.partijvoordedieren.nl' },
+            { party: 'PVV', short: 'PVV', count: 8, website: 'https://www.pvv.nl' },
+            { party: 'SGP', short: 'SGP', count: 5, website: 'https://www.sgp.nl' },
+            { party: 'SP', short: 'SP', count: 16, website: 'https://www.sp.nl' },
+            { party: 'Volt', short: 'Volt', count: 19, website: 'https://www.voltnederland.org' },
+            { party: 'VVD', short: 'VVD', count: 13, website: 'https://www.vvd.nl' }
+        ];
+
+        // Mock key points data
+        const mockKeyPoints = [
+            {
+                title: 'Titel Standpunt',
+                subtitle: 'Beschrijving van dit standpunt',
+                quotes: [
+                    '"Dit is een belangrijk onderwerp dat onze aandacht verdient."',
+                    '"We investeren in duurzame oplossingen voor de toekomst."',
+                    '"Samenwerking en innovatie staan centraal in onze aanpak."'
+                ]
+            },
+            {
+                title: 'Titel Standpunt',
+                subtitle: 'Beschrijving van dit standpunt',
+                quotes: [
+                    '"We zorgen voor evenwicht tussen verschillende belangen."',
+                    '"Praktische maatregelen die direct effect hebben."'
+                ]
+            },
+            {
+                title: 'Titel Standpunt',
+                subtitle: 'Beschrijving van dit standpunt',
+                quotes: [
+                    '"Lange termijn visie met concrete kortetermijn stappen."'
+                ]
+            }
+        ];
+
+        // Sort data by count (highest first)
+        const sortedData = [...mockData].sort((a, b) => b.count - a.count);
+        const maxCount = Math.max(...mockData.map(d => d.count));
+
+        // Render chart
+        const chartContainer = document.getElementById('chartContainer');
+        const chartHeight = 300; // Available height for bars (360px - padding for label)
+        
+        sortedData.forEach(item => {
+            if (item.count === 0) return; // Skip parties with 0 mentions
+            
+            const barHeight = maxCount > 0 ? (item.count / maxCount) * chartHeight : 0;
+            const barColor = item.count > 10 ? 'bg-blue-600' : item.count > 5 ? 'bg-blue-500' : item.count > 0 ? 'bg-blue-400' : 'bg-gray-200';
+            const partyId = item.short.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '');
+            
+            const barHTML = `
+                <a href="#${partyId}" class="flex flex-col items-center group flex-shrink-0" style="width: 60px; height: 100%;">
+                    <div class="flex-grow flex flex-col justify-end w-full">
+                        <div class="${barColor} w-full rounded-t transition-all duration-500 flex flex-col items-center justify-start pt-2" style="height: ${barHeight}px;">
+                            <span class="text-xs font-medium text-white">${item.count}</span>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-700 group-hover:text-blue-600 transition-colors mt-2 text-center break-words w-full">${item.short}</span>
+                </a>
+            `;
+            chartContainer.innerHTML += barHTML;
+        });
+
+        // Render party results (sorted by count, highest first)
+        const partyResults = document.getElementById('partyResults');
+        sortedData.forEach(item => {
+            if (item.count === 0) return; // Skip parties with 0 mentions
+            
+            const partyId = item.short.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '');
+            
+            const partyHTML = `
+                <div id="${partyId}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-24">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="text-xl font-medium text-gray-800">${item.party}</h3>
+                            <p class="text-sm text-gray-500 mt-1">${item.count} vermelding${item.count !== 1 ? 'en' : ''} gevonden</p>
+                        </div>
+                        <a href="${item.website}" target="_blank" class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 transition-colors">
+                            Lees meer
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    
+                    <div class="space-y-5">
+                        ${mockKeyPoints.map(point => `
+                            <div class="border-l-2 border-blue-500 pl-4">
+                                <h4 class="font-medium text-gray-800 mb-1">${point.title}</h4>
+                                <p class="text-sm text-gray-600 mb-3">${point.subtitle}</p>
+                                <div class="space-y-2">
+                                    ${point.quotes.map(quote => `
+                                        <p class="text-sm text-gray-700 italic bg-gray-50 p-3 rounded">${quote}</p>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            partyResults.innerHTML += partyHTML;
+        });
+
+        // Handle search form
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newQuery = document.getElementById('searchInput').value.trim();
+            if (newQuery) {
+                window.location.href = `resultaat.html?q=${encodeURIComponent(newQuery)}`;
+            }
+        });
+
+        // Animate bars on load
+        setTimeout(() => {
+            document.querySelectorAll('[style*="width"]').forEach(el => {
+                el.style.transition = 'width 0.8s ease-out';
+            });
+        }, 100);
+    </script>
+
+</body>
+</html>
+
