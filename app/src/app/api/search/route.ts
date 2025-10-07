@@ -187,6 +187,7 @@ JSON formaat:
 STRIKTE REGELS:
 - Quotes moeten EXACT matchen met brontekst
 - Geen parafraseren of samenvatten
+- GEEN DUPLICATE QUOTES - elke quote mag maar 1x voorkomen, ook niet over verschillende standpunten heen
 - Titel = het standpunt, Subtitle = de context/redenering
 - Alleen substantiële, concrete standpunten
 - Bij twijfel: weglaten
@@ -218,6 +219,23 @@ STRIKTE REGELS:
       standpunten: []
     }
   }
+
+  // Deduplicate quotes across all standpunten
+  const seenQuotes = new Set<string>()
+  parsedResponse.standpunten = parsedResponse.standpunten.map((standpunt: any) => {
+    const uniqueQuotes = standpunt.quotes.filter((quote: any) => {
+      const key = `${quote.text.trim().toLowerCase()}|${quote.page}`
+      if (seenQuotes.has(key)) {
+        return false // Skip duplicate
+      }
+      seenQuotes.add(key)
+      return true
+    })
+    return {
+      ...standpunt,
+      quotes: uniqueQuotes
+    }
+  }).filter((standpunt: any) => standpunt.quotes.length > 0) // Remove standpunten with no quotes left
 
   // Calculate total count (number of quotes)
   const totalCount = parsedResponse.standpunten.reduce(
