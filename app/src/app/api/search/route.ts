@@ -35,6 +35,49 @@ async function analyzeParty(
     }
   }
 
+  // Check cache first
+  const cachedResult = await prisma.searchResult.findUnique({
+    where: {
+      query_partyId: {
+        query,
+        partyId: party.id
+      }
+    },
+    include: {
+      positions: {
+        include: {
+          quotes: {
+            orderBy: { ordinal: 'asc' }
+          }
+        },
+        orderBy: { ordinal: 'asc' }
+      }
+    }
+  })
+
+  // If cached, return formatted result
+  if (cachedResult) {
+    const standpunten = cachedResult.positions.map(pos => ({
+      title: pos.title,
+      subtitle: pos.subtitle,
+      quotes: pos.quotes.map(q => ({
+        text: q.text,
+        page: q.page
+      }))
+    }))
+
+    const count = standpunten.reduce((sum, s) => sum + s.quotes.length, 0)
+
+    return {
+      party: partyName,
+      short: partyShort,
+      count,
+      website: partyWebsite,
+      standpunten
+    }
+  }
+
+  // Not cached, generate new results
   const program = party.programs[0]
 
   // Perform vector similarity search (top 50 chunks)
@@ -181,6 +224,33 @@ STRIKTE REGELS:
     (sum: number, s: any) => sum + s.quotes.length,
     0
   )
+
+  // Save to cache
+  try {
+    await prisma.searchResult.create({
+      data: {
+        query,
+        partyId: party.id,
+        positions: {
+          create: parsedResponse.standpunten.map((standpunt: any, idx: number) => ({
+            title: standpunt.title,
+            subtitle: standpunt.subtitle,
+            ordinal: idx + 1,
+            quotes: {
+              create: standpunt.quotes.map((quote: any, qIdx: number) => ({
+                text: quote.text,
+                page: quote.page,
+                ordinal: qIdx + 1
+              }))
+            }
+          }))
+        }
+      }
+    })
+  } catch (e) {
+    console.error(`Failed to cache results for ${partyName}:`, e)
+    // Continue even if caching fails
+  }
 
   return {
     party: partyName,
