@@ -5,28 +5,6 @@ import { embed, generateText } from 'ai'
 
 const prisma = new PrismaClient()
 
-// Party names to analyze
-const PARTY_NAMES = [
-  'BIJ1',
-  'BBB',
-  'BVNL',
-  'CDA',
-  'GroenLinks-PvdA',
-  'ChristenUnie',
-  'D66',
-  'PvdD',
-  'PVV',
-  'SP',
-  'FVD',
-  '50PLUS',
-  'SGP',
-  'NSC',
-  'JA21',
-  'DENK',
-  'VVD',
-  'Volt',
-]
-
 async function analyzeParty(
   query: string,
   partyId: string,
@@ -301,12 +279,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Query parameter is required' }, { status: 400 })
     }
 
-    // Fetch parties from database
-    const parties = await prisma.party.findMany({
-      where: {
-        name: { in: PARTY_NAMES }
-      }
-    })
+    // Fetch all parties from database
+    const parties = await prisma.party.findMany()
 
     // Generate embedding once for the search query
     const { embedding } = await embed({
