@@ -39,7 +39,7 @@ The seeder will:
 3. **Process each PDF:**
    - Load the PDF using LangChain's PDFLoader
    - Split text into chunks (~1000 characters with 200 character overlap)
-   - Generate embeddings using OpenAI's `text-embedding-3-small` model
+   - Generate embeddings using Vercel AI SDK with OpenAI's `text-embedding-3-small` model
    - Store chunks with embeddings in the Document table
 
 ## Expected Output

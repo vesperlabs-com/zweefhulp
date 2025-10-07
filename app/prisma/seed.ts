@@ -1,14 +1,11 @@
 import { PrismaClient } from '../src/generated/prisma'
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf'
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
-import OpenAI from 'openai'
+import { openai } from '@ai-sdk/openai'
+import { embed } from 'ai'
 import { join } from 'path'
-import * as pdfjsLib from 'pdfjs-dist'
 
 const prisma = new PrismaClient()
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
 
 // Mapping of PDF filenames to party information
 const PARTY_PROGRAMS = [
@@ -33,11 +30,11 @@ const PARTY_PROGRAMS = [
 ]
 
 async function generateEmbedding(text: string): Promise<number[]> {
-  const response = await openai.embeddings.create({
-    model: 'text-embedding-3-small',
-    input: text,
+  const { embedding } = await embed({
+    model: openai.embedding('text-embedding-3-small'),
+    value: text,
   })
-  return response.data[0].embedding
+  return embedding
 }
 
 async function processProgram(partyName: string, fileName: string, year: number) {

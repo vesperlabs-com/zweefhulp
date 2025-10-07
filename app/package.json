@@ -13,6 +13,7 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.0.10",
     "@langchain/community": "^0.3.57",
     "@langchain/core": "^0.3.78",
     "@langchain/textsplitters": "^0.1.0",
@@ -20,8 +21,8 @@
     "@prisma/adapter-neon": "^6.16.3",
     "@prisma/client": "^6.16.3",
     "@prisma/extension-accelerate": "^2.0.2",
+    "ai": "^4.1.10",
     "next": "15.5.4",
-    "openai": "^6.2.0",
     "pdf-parse": "^2.2.1",
     "pdfjs-dist": "^4.4.168",
     "react": "19.2.0",
