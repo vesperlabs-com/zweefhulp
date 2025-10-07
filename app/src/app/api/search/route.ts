@@ -71,24 +71,60 @@ async function analyzeParty(
     `[${idx + 1}] (Pagina ${r.pageNumber}): ${r.content}`
   ).join('\n\n')
 
-  const prompt = `Je bent een expert in het analyseren van politieke verkiezingsprogramma's. 
+  const prompt = `Je bent een expert in het analyseren van politieke verkiezingsprogramma's. Je bent ZEER selectief en kritisch.
 
-Hieronder staan tekst fragmenten uit het ${partyName} verkiezingsprogramma die relevant zijn voor de zoekopdracht: "${query}"
+Hieronder staan tekst fragmenten uit het ${partyName} verkiezingsprogramma. De zoekopdracht is: "${query}"
 
 ${chunksContext}
 
-Je taak is om:
-1. Deze fragmenten te groeperen in maximaal 5 semantisch verschillende standpunten/posities
-2. Voor elk standpunt: 
-   - Geef een duidelijke titel (max 10 woorden)
-   - Geef een korte beschrijving/ondertitel (max 20 woorden)
-   - Selecteer maximaal 5 meest relevante en representatieve quotes (VERBATIM uit de tekst, geen parafrasering!)
-   - Elk quote moet duidelijk dit standpunt ondersteunen
-   - Vermeld het fragment nummer [X] en paginanummer bij elk quote
+KRITISCHE ANALYSE VEREIST:
+1. Beoordeel elk fragment op echte relevantie voor "${query}". Vage of algemene uitspraken NIET includeren.
+2. Identificeer alleen DUIDELIJK VERSCHILLENDE standpunten/posities. Als quotes hetzelfde zeggen, groepeer ze onder 1 standpunt.
+3. Minder is meer! Lever ALLEEN standpunten die echt waardevol zijn.
+4. Selecteer alleen de MEEST CONCRETE en INFORMATIEVE quotes (verbatim).
 
-3. Negeer fragmenten die niet echt relevant zijn of te vaag/algemeen zijn
+KWALITEIT BOVEN KWANTITEIT:
+- Als er maar 1-2 echte standpunten zijn: geef alleen die
+- Als fragmenten te vaag zijn: negeer ze
+- Als quotes elkaar herhalen: kies de beste
+- Maximaal 3 standpunten, maximaal 3 quotes per standpunt
+- Als er NIETS echt relevants is: return lege array
 
-Geef je antwoord als een JSON object in dit formaat:
+STRUCTUUR VAN ELK STANDPUNT:
+
+1. **Title (Titel)**: De concrete positie/het standpunt van de partij
+   - Formuleer als een duidelijke positie of voorstel
+   - Voorbeeld: "Meer sociale woningen bouwen" of "Verlaging van CO2-uitstoot verplichten"
+   - Max 8 woorden
+   - Vermijd vage termen als "aanpak" of "beleid"
+
+2. **Subtitle (Ondertitel)**: De context of redenering
+   - WAAROM neemt de partij dit standpunt in?
+   - WELK probleem adresseert het?
+   - HOE relateert het aan "${query}"?
+   - Voorbeeld bij "Meer sociale woningen bouwen": "Om wachtlijsten te verkorten en betaalbaar wonen te garanderen"
+   - Max 15 woorden
+   - Voeg waarde toe, herhaal niet de titel
+
+3. **Quotes**: VERBATIM bewijs uit het programma
+   - Exacte citaten die dit standpunt ondersteunen
+   - Concreet en informatief
+   - Niet parafraseren!
+
+VOORBEELD:
+Slecht:
+{
+  "title": "Beleid voor woningmarkt",
+  "subtitle": "De partij heeft plannen voor woningen"
+}
+
+Goed:
+{
+  "title": "100.000 sociale huurwoningen per jaar bijbouwen",
+  "subtitle": "Om starter en middeninkomens toegang tot betaalbaar wonen te geven"
+}
+
+JSON formaat:
 {
   "standpunten": [
     {
@@ -96,7 +132,7 @@ Geef je antwoord als een JSON object in dit formaat:
       "subtitle": "...",
       "quotes": [
         {
-          "text": "exacte quote uit de tekst",
+          "text": "exacte quote",
           "page": 42,
           "fragmentNumber": 5
         }
@@ -105,18 +141,19 @@ Geef je antwoord als een JSON object in dit formaat:
   ]
 }
 
-BELANGRIJK: 
-- Quotes moeten EXACT overeenkomen met de brontekst (verbatim)
-- Filter niet-relevante of te algemene fragmenten eruit
-- Groepeer alleen quotes die echt hetzelfde standpunt ondersteunen
-- Maximaal 5 standpunten, maximaal 5 quotes per standpunt
-- Antwoord ALLEEN met het JSON object, geen extra tekst`
+STRIKTE REGELS:
+- Quotes moeten EXACT matchen met brontekst
+- Geen parafraseren of samenvatten
+- Titel = het standpunt, Subtitle = de context/redenering
+- Alleen substantiële, concrete standpunten
+- Bij twijfel: weglaten
+- Antwoord ALLEEN met JSON, geen extra tekst`
 
-  // Generate analysis with LLM
+  // Generate analysis with LLM (using GPT-4o for better reasoning)
   const { text } = await generateText({
-    model: openai('gpt-4o-mini'),
+    model: openai('gpt-4o'),
     prompt,
-    temperature: 0.3,
+    temperature: 0.2,
   })
 
   // Parse the LLM response
