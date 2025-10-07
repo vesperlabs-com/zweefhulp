@@ -23,13 +23,17 @@ type PartyResult = {
   standpunten: Standpunt[]
 }
 
+type SearchResults = {
+  parties: PartyResult[]
+}
+
 function SearchContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const query = searchParams.get('q') || ''
   
   const [searchQuery, setSearchQuery] = useState(query)
-  const [results, setResults] = useState<PartyResult | null>(null)
+  const [results, setResults] = useState<SearchResults | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -123,72 +127,103 @@ function SearchContent() {
               <h2 className="text-lg font-medium text-gray-800 mb-6">Frequentie van vermeldingen</h2>
               
               <div className="flex items-end justify-start gap-3 overflow-x-auto pb-2 pt-2" style={{ height: '360px' }}>
-                {results.count > 0 ? (
-                  <div className="flex flex-col items-center group flex-shrink-0" style={{ width: '60px', height: '100%' }}>
-                    <div className="flex-grow flex flex-col justify-end w-full">
-                      <div 
-                        className="bg-blue-600 w-full rounded-t transition-all duration-500 flex flex-col items-center justify-start pt-2" 
-                        style={{ height: `${(results.count / results.count) * 300}px` }}
+                {(() => {
+                  const sortedParties = [...results.parties].sort((a, b) => b.count - a.count)
+                  const maxCount = Math.max(...results.parties.map(p => p.count), 1)
+                  const hasResults = sortedParties.some(p => p.count > 0)
+                  
+                  if (!hasResults) {
+                    return <p className="text-gray-500 text-sm">Geen vermeldingen gevonden</p>
+                  }
+                  
+                  return sortedParties.map((party) => {
+                    if (party.count === 0) return null
+                    
+                    const barHeight = (party.count / maxCount) * 300
+                    const barColor = party.count > 10 ? 'bg-blue-600' : party.count > 5 ? 'bg-blue-500' : 'bg-blue-400'
+                    const partyId = party.short.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '')
+                    
+                    return (
+                      <a 
+                        key={party.short}
+                        href={`#${partyId}`}
+                        className="flex flex-col items-center group flex-shrink-0" 
+                        style={{ width: '60px', height: '100%' }}
                       >
-                        <span className="text-xs font-medium text-white">{results.count}</span>
-                      </div>
-                    </div>
-                    <span className="text-xs text-gray-700 group-hover:text-blue-600 transition-colors mt-2 text-center break-words w-full">
-                      {results.short}
-                    </span>
-                  </div>
-                ) : (
-                  <p className="text-gray-500 text-sm">Geen vermeldingen gevonden</p>
-                )}
+                        <div className="flex-grow flex flex-col justify-end w-full">
+                          <div 
+                            className={`${barColor} w-full rounded-t transition-all duration-500 flex flex-col items-center justify-start pt-2`}
+                            style={{ height: `${barHeight}px` }}
+                          >
+                            <span className="text-xs font-medium text-white">{party.count}</span>
+                          </div>
+                        </div>
+                        <span className="text-xs text-gray-700 group-hover:text-blue-600 transition-colors mt-2 text-center break-words w-full">
+                          {party.short}
+                        </span>
+                      </a>
+                    )
+                  })
+                })()}
               </div>
             </div>
 
             {/* Party Results */}
             <div className="space-y-6">
-              {results.count > 0 ? (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-xl font-medium text-gray-800">{results.party}</h3>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {results.count} vermelding{results.count !== 1 ? 'en' : ''} gevonden
-                      </p>
-                    </div>
-                    <a
-                      href={results.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 transition-colors"
-                    >
-                      Lees meer
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  </div>
+              {results.parties
+                .sort((a, b) => b.count - a.count)
+                .map((partyResult) => {
+                  const partyId = partyResult.short.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '')
                   
-                  <div className="space-y-5">
-                    {results.standpunten.map((standpunt, idx) => (
-                      <div key={idx} className="border-l-2 border-blue-500 pl-4">
-                        <h4 className="font-medium text-gray-800 mb-1">{standpunt.title}</h4>
-                        <p className="text-sm text-gray-600 mb-3">{standpunt.subtitle}</p>
-                        <div className="space-y-2">
-                          {standpunt.quotes.map((quote, qIdx) => (
-                            <div key={qIdx} className="text-sm text-gray-700 italic bg-gray-50 p-3 rounded">
-                              <p>&ldquo;{quote.text}&rdquo;</p>
-                              <p className="text-xs text-gray-500 mt-1">Pagina {quote.page}</p>
+                  return (
+                    <div 
+                      key={partyResult.party} 
+                      id={partyId}
+                      className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-24"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 className="text-xl font-medium text-gray-800">{partyResult.party}</h3>
+                          <p className="text-sm text-gray-500 mt-1">
+                            {partyResult.count} vermelding{partyResult.count !== 1 ? 'en' : ''} gevonden
+                          </p>
+                        </div>
+                        <a
+                          href={partyResult.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 transition-colors"
+                        >
+                          Lees meer
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      </div>
+                      
+                      {partyResult.count > 0 ? (
+                        <div className="space-y-5">
+                          {partyResult.standpunten.map((standpunt, idx) => (
+                            <div key={idx} className="border-l-2 border-blue-500 pl-4">
+                              <h4 className="font-medium text-gray-800 mb-1">{standpunt.title}</h4>
+                              <p className="text-sm text-gray-600 mb-3">{standpunt.subtitle}</p>
+                              <div className="space-y-2">
+                                {standpunt.quotes.map((quote, qIdx) => (
+                                  <div key={qIdx} className="text-sm text-gray-700 italic bg-gray-50 p-3 rounded">
+                                    <p>&ldquo;{quote.text}&rdquo;</p>
+                                    <p className="text-xs text-gray-500 mt-1">Pagina {quote.page}</p>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           ))}
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-                  <p className="text-gray-600">Geen vermeldingen gevonden voor &ldquo;{query}&rdquo; bij {results.party}.</p>
-                </div>
-              )}
+                      ) : (
+                        <p className="text-gray-600 text-sm">Geen relevante vermeldingen gevonden in dit programma.</p>
+                      )}
+                    </div>
+                  )
+                })}
             </div>
           </>
         )}
