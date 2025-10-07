@@ -10,7 +10,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",
@@ -25,6 +26,7 @@
     "next": "15.5.4",
     "pdf-parse": "^2.2.1",
     "pdfjs-dist": "^4.4.168",
+    "prisma": "^6.16.3",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },
@@ -35,7 +37,6 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.1",
-    "prisma": "^6.16.3",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
