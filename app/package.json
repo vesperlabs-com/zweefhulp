@@ -10,6 +10,8 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "@prisma/adapter-neon": "^6.16.3",
     "@prisma/client": "^6.16.3",
     "@prisma/extension-accelerate": "^2.0.2",
     "next": "15.5.4",
