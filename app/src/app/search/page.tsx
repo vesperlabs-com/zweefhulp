@@ -27,6 +27,23 @@ type SearchResults = {
   parties: PartyResult[]
 }
 
+const LOADING_MESSAGES = [
+  'Even koffie halen voor de Tweede Kamer...',
+  'Politieke streepjes aan het tellen (zonder regeerakkoord)...',
+  'Coalitieonderhandelingen aan het speedrunnen...',
+  'Verkiezingsbeloftes aan het feit-checken... dit kan even duren...',
+  'Standpunten aan het vergelijken (zonder ruzie te maken)...',
+  'Debatleden aan het briefen over jouw vraag...',
+  'Compromissen aan het pre-kauwen voor je...',
+  'Even de Kieswet nalezen... grapje, dit gaat sneller...',
+  'Programmapunten zoeken met een vergrootglas... 🔍',
+  'Stemhokjes aan het opbouwen (digitaal dan)...',
+  'Fractieleden aan het wakker maken...',
+  'Even overleggen met het pluche...',
+  'Kamerzetels aan het tellen alsof het Black Friday is...',
+  'Wacht, eerst even applaus voor de democratie... 👏',
+]
+
 function SearchContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -36,6 +53,7 @@ function SearchContent() {
   const [results, setResults] = useState<SearchResults | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0])
 
   useEffect(() => {
     if (query) {
@@ -47,6 +65,15 @@ function SearchContent() {
     setLoading(true)
     setError(null)
     
+    // Rotate loading messages every 3 seconds
+    const randomMessage = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
+    setLoadingMessage(randomMessage)
+    
+    const interval = setInterval(() => {
+      const newMessage = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
+      setLoadingMessage(newMessage)
+    }, 3000)
+    
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(q)}`)
       if (!response.ok) {
@@ -57,6 +84,7 @@ function SearchContent() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Er is iets misgegaan')
     } finally {
+      clearInterval(interval)
       setLoading(false)
     }
   }
@@ -110,7 +138,7 @@ function SearchContent() {
         {loading && (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">Zoeken...</p>
+            <p className="mt-4 text-gray-600">{loadingMessage}</p>
           </div>
         )}
 
