@@ -6,7 +6,26 @@ import { embed, generateText } from 'ai'
 const prisma = new PrismaClient()
 
 // Party names to analyze
-const PARTY_NAMES = ['GroenLinks-PvdA', 'VVD', 'PVV']
+const PARTY_NAMES = [
+  'BIJ1',
+  'BBB',
+  'BVNL',
+  'CDA',
+  'GroenLinks-PvdA',
+  'ChristenUnie',
+  'D66',
+  'PvdD',
+  'PVV',
+  'SP',
+  'FVD',
+  '50PLUS',
+  'SGP',
+  'NSC',
+  'JA21',
+  'DENK',
+  'VVD',
+  'Volt',
+]
 
 async function analyzeParty(
   query: string,
