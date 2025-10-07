@@ -19,6 +19,9 @@ datasource db {
 model Party {
   id            String         @id @default(cuid())
   name          String         @unique
+  shortName     String?
+  website       String?
+  logoUrl       String?
   
   programs      Program[]
   searchResults SearchResult[]

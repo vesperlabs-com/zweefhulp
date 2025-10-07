@@ -5,32 +5,26 @@ import { embed, generateText } from 'ai'
 
 const prisma = new PrismaClient()
 
-// Party configurations
-const PARTIES = [
-  { name: 'GroenLinks-PvdA', short: 'GL-PvdA', website: 'https://groenlinks-pvda.nl' },
-  { name: 'VVD', short: 'VVD', website: 'https://www.vvd.nl' },
-  { name: 'PVV', short: 'PVV', website: 'https://www.pvv.nl' },
-]
+// Party names to analyze
+const PARTY_NAMES = ['GroenLinks-PvdA', 'VVD', 'PVV']
 
 async function analyzeParty(
   query: string,
-  partyName: string,
-  partyShort: string,
-  partyWebsite: string,
+  partyId: string,
   vectorString: string
 ) {
-  // Get party and program
+  // Get party with metadata and program
   const party = await prisma.party.findUnique({
-    where: { name: partyName },
+    where: { id: partyId },
     include: { programs: true }
   })
 
   if (!party || party.programs.length === 0) {
     return {
-      party: partyName,
-      short: partyShort,
+      party: party?.name || 'Unknown',
+      short: party?.shortName || 'Unknown',
       count: 0,
-      website: partyWebsite,
+      website: party?.website || '#',
       standpunten: []
     }
   }
@@ -69,10 +63,10 @@ async function analyzeParty(
     const count = standpunten.reduce((sum, s) => sum + s.quotes.length, 0)
 
     return {
-      party: partyName,
-      short: partyShort,
+      party: party.name,
+      short: party.shortName || party.name,
       count,
-      website: partyWebsite,
+      website: party.website || '#',
       standpunten
     }
   }
@@ -101,10 +95,10 @@ async function analyzeParty(
   // If no results found
   if (results.length === 0) {
     return {
-      party: partyName,
-      short: partyShort,
+      party: party.name,
+      short: party.shortName || party.name,
       count: 0,
-      website: partyWebsite,
+      website: party.website || '#',
       standpunten: []
     }
   }
@@ -116,7 +110,7 @@ async function analyzeParty(
 
   const prompt = `Je bent een expert in het analyseren van politieke verkiezingsprogramma's. Je bent ZEER selectief en kritisch.
 
-Hieronder staan tekst fragmenten uit het ${partyName} verkiezingsprogramma. De zoekopdracht is: "${query}"
+Hieronder staan tekst fragmenten uit het ${party.name} verkiezingsprogramma. De zoekopdracht is: "${query}"
 
 ${chunksContext}
 
@@ -210,12 +204,12 @@ STRIKTE REGELS:
       parsedResponse = JSON.parse(text)
     }
   } catch (e) {
-    console.error(`Failed to parse LLM response for ${partyName}:`, text)
+    console.error(`Failed to parse LLM response for ${party.name}:`, text)
     return {
-      party: partyName,
-      short: partyShort,
+      party: party.name,
+      short: party.shortName || party.name,
       count: 0,
-      website: partyWebsite,
+      website: party.website || '#',
       standpunten: []
     }
   }
@@ -266,15 +260,15 @@ STRIKTE REGELS:
       }
     })
   } catch (e) {
-    console.error(`Failed to cache results for ${partyName}:`, e)
+    console.error(`Failed to cache results for ${party.name}:`, e)
     // Continue even if caching fails
   }
 
   return {
-    party: partyName,
-    short: partyShort,
+    party: party.name,
+    short: party.shortName || party.name,
     count: totalCount,
-    website: partyWebsite,
+    website: party.website || '#',
     standpunten: parsedResponse.standpunten
   }
 }
@@ -288,6 +282,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Query parameter is required' }, { status: 400 })
     }
 
+    // Fetch parties from database
+    const parties = await prisma.party.findMany({
+      where: {
+        name: { in: PARTY_NAMES }
+      }
+    })
+
     // Generate embedding once for the search query
     const { embedding } = await embed({
       model: openai.embedding('text-embedding-3-small'),
@@ -298,8 +299,8 @@ export async function GET(request: NextRequest) {
 
     // Analyze all parties in parallel
     const results = await Promise.all(
-      PARTIES.map(party => 
-        analyzeParty(query, party.name, party.short, party.website, vectorString)
+      parties.map(party => 
+        analyzeParty(query, party.id, vectorString)
       )
     )
 

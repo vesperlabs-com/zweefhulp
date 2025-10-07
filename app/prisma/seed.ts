@@ -7,6 +7,28 @@ import { join } from 'path'
 
 const prisma = new PrismaClient()
 
+// Party metadata
+const PARTY_METADATA: Record<string, { shortName: string; website: string }> = {
+  'BIJ1': { shortName: 'BIJ1', website: 'https://bij1.org' },
+  'BBB': { shortName: 'BBB', website: 'https://www.boerburgerbeweging.nl' },
+  'BVNL': { shortName: 'BVNL', website: 'https://bvnl.nl' },
+  'CDA': { shortName: 'CDA', website: 'https://www.cda.nl' },
+  'GroenLinks-PvdA': { shortName: 'GL-PvdA', website: 'https://groenlinks-pvda.nl' },
+  'ChristenUnie': { shortName: 'CU', website: 'https://www.christenunie.nl' },
+  'D66': { shortName: 'D66', website: 'https://d66.nl' },
+  'PvdD': { shortName: 'PvdD', website: 'https://www.partijvoordedieren.nl' },
+  'PVV': { shortName: 'PVV', website: 'https://www.pvv.nl' },
+  'SP': { shortName: 'SP', website: 'https://www.sp.nl' },
+  'FVD': { shortName: 'FvD', website: 'https://www.fvd.nl' },
+  '50PLUS': { shortName: '50+', website: 'https://50pluspartij.nl' },
+  'SGP': { shortName: 'SGP', website: 'https://www.sgp.nl' },
+  'NSC': { shortName: 'NSC', website: 'https://www.nieuwsociaalcontract.nl' },
+  'JA21': { shortName: 'JA21', website: 'https://ja21.nl' },
+  'DENK': { shortName: 'DENK', website: 'https://bewegingdenk.nl' },
+  'VVD': { shortName: 'VVD', website: 'https://www.vvd.nl' },
+  'Volt': { shortName: 'Volt', website: 'https://www.voltnederland.org' },
+}
+
 // Mapping of PDF filenames to party information
 const PARTY_PROGRAMS = [
   { party: 'BIJ1', fileName: '20250925_Programma_BIJ1_Losse-Pagina-2.pdf', year: 2025 },
@@ -40,11 +62,21 @@ async function generateEmbedding(text: string): Promise<number[]> {
 async function processProgram(partyName: string, fileName: string, year: number) {
   console.log(`\n📄 Processing ${partyName} - ${fileName}`)
 
-  // Create or get party
+  // Get party metadata
+  const metadata = PARTY_METADATA[partyName]
+  
+  // Create or get party with metadata
   const party = await prisma.party.upsert({
     where: { name: partyName },
-    update: {},
-    create: { name: partyName },
+    update: {
+      shortName: metadata?.shortName,
+      website: metadata?.website,
+    },
+    create: {
+      name: partyName,
+      shortName: metadata?.shortName,
+      website: metadata?.website,
+    },
   })
 
   // Create or get program
