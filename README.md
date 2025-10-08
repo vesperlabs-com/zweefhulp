@@ -13,7 +13,7 @@ Een AI-aangedreven zoektool om verkiezingsprogramma's van de Tweede Kamerverkiez
 - **Next.js 15** met React 19 en TypeScript
 - **PostgreSQL** met pgvector voor semantisch zoeken
 - **Prisma ORM** voor database beheer
-- **OpenAI embeddings** via LangChain voor AI-zoekfunctionaliteit
+- **OpenAI embeddings** voor AI-zoekfunctionaliteit
 - **Tailwind CSS** voor moderne styling
 - **pnpm** als package manager
 
