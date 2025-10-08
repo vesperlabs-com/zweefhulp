@@ -28,18 +28,18 @@ type SearchResults = {
 }
 
 const LOADING_MESSAGES = [
-  'Even koffie halen voor de Tweede Kamer...',
+  'Koffie halen voor de Tweede Kamer...',
   'Politieke streepjes aan het tellen...',
   'Coalitieonderhandelingen aan het speedrunnen...',
   'Verkiezingsbeloftes aan het feit-checken...',
   'Standpunten aan het vergelijken...',
   'Debatleden aan het briefen over jouw vraag...',
   'Compromissen aan het pre-kauwen voor je...',
-  'Even de Kieswet nalezen...',
+  'De Kieswet aan het nalezen...',
   'Programmapunten zoeken met een vergrootglas...',
   'Stemhokjes aan het opbouwen...',
   'Fractieleden aan het wakker maken...',
-  'Even overleggen met het pluche...',
+  'Overleggen met het pluche...',
   'Achterkamertjes even raadplegen...',
   'Applaus voor de democratie optrommelen...',
 ]
@@ -54,6 +54,9 @@ function SearchContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0])
+
+  // Encode query with + for spaces (like Google)
+  const encodeQuery = (q: string) => encodeURIComponent(q).replace(/%20/g, '+')
 
   useEffect(() => {
     if (query) {
@@ -94,7 +97,7 @@ function SearchContent() {
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+      router.push(`/search?q=${encodeQuery(searchQuery.trim())}`)
     }
   }
 

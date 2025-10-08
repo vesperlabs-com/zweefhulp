@@ -8,10 +8,13 @@ export default function Home() {
   const [query, setQuery] = useState('')
   const router = useRouter()
 
+  // Encode query with + for spaces (like Google)
+  const encodeQuery = (q: string) => encodeURIComponent(q).replace(/%20/g, '+')
+
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
     if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query.trim())}`)
+      router.push(`/search?q=${encodeQuery(query.trim())}`)
     }
   }
 
@@ -63,7 +66,7 @@ export default function Home() {
               'zorgakkoord',
               'europa',
             ].map((term) => (
-              <Link href={`/search?q=${term}`}
+              <Link href={`/search?q=${encodeURIComponent(term).replace(/%20/g, '+')}`}
                 key={term}
                 className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-full text-sm border border-gray-200 transition-colors"
               >
