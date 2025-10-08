@@ -60,7 +60,8 @@ export default function Home() {
               'normen en waarden',
               'startups',
               'asielzoekers',
-              'europa'
+              'zorgakkoord',
+              'europa',
             ].map((term) => (
               <Link href={`/search?q=${term}`}
                 key={term}

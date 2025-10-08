@@ -4,10 +4,9 @@ Een AI-aangedreven zoektool om verkiezingsprogramma's van de Tweede Kamerverkiez
 
 ## Functies
 
-- 🔍 **Semantisch zoeken** - Vind relevante standpunten op basis van betekenis, niet alleen exacte zoektermen
-- 📊 **Visuele vergelijking** - Zie in één oogopslag welke partijen het meeste schrijven over jouw onderwerp
-- 💬 **Directe citaten** - Lees de exacte tekst uit de verkiezingsprogramma's met paginanummers
-- 🎯 **Gestructureerde resultaten** - Standpunten worden samengevat met ondersteunende citaten
+- **Semantisch zoeken** - Vind relevante standpunten op basis van betekenis, niet alleen exacte zoektermen
+- **Visuele vergelijking** - Zie in één oogopslag welke partijen het meeste schrijven over jouw onderwerp
+- **Directe citaten** - Lees de exacte tekst uit de verkiezingsprogramma's met paginanummers
 
 ## Technologie
 
@@ -33,7 +32,7 @@ Het project gebruikt PostgreSQL met de pgvector extensie voor vector embeddings.
 
 ### Verkiezingsprogramma's
 
-Alle verkiezingsprogramma's zijn gedownload op **6 oktober 2025** van de officiële websites van de politieke partijen. De PDF's staan opgeslagen in de [`app/programs/`](app/programs/) directory. Deze worden tijdens het seeden verwerkt en geïndexeerd in de database.
+Alle verkiezingsprogramma's zijn gedownload op **6 oktober 2025** van de officiële websites van de politieke partijen. Ze zijn niet aangepast en opgeslagen in de [`app/programs/`](app/programs/) directory. Deze worden tijdens het seeden verwerkt en geïndexeerd in de database.
 
 ## AI
 
