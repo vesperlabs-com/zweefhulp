@@ -43,7 +43,7 @@ model Program {
 model Document {
   id         String                 @id @default(cuid())
   content    String
-  vector     Unsupported("vector")?
+  vector     Unsupported("vector(1536)")?
   
   programId  String
   program    Program                @relation(fields: [programId], references: [id], onDelete: Cascade)

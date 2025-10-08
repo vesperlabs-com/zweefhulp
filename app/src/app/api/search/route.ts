@@ -70,12 +70,14 @@ async function analyzeParty(
   const program = party.programs[0]
 
   // Perform vector similarity search (top 50 chunks)
+  // Set ivfflat.probes for optimal recall/performance balance
   const results = await prisma.$queryRaw<Array<{
     id: string
     content: string
     pageNumber: number
     similarity: number
   }>>`
+    SET LOCAL ivfflat.probes = 10;
     SELECT 
       id,
       content,
