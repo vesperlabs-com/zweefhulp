@@ -18,7 +18,55 @@ Een AI-aangedreven zoektool om verkiezingsprogramma's van de Tweede Kamerverkiez
 - **Tailwind CSS** voor moderne styling
 - **pnpm** als package manager
 
-## Quick Start
+## Data
+
+### Database
+
+Het project gebruikt PostgreSQL met de pgvector extensie voor vector embeddings. De database schema bevat:
+
+- **Party** - Politieke partijen met metadata
+- **Program** - Verkiezingsprogramma's (PDFs)
+- **Document** - Geparseerde pagina's met vector embeddings
+- **SearchResult** - Gecachte zoekresultaten
+- **Position** - Standpunten per partij
+- **Quote** - Citaten uit programma's
+
+### Verkiezingsprogramma's
+
+Alle verkiezingsprogramma's zijn gedownload op **6 oktober 2025** van de officiële websites van de politieke partijen. De PDF's staan opgeslagen in de [`app/programs/`](app/programs/) directory. Deze worden tijdens het seeden verwerkt en geïndexeerd in de database.
+
+## AI
+
+Zweefhulp gebruikt AI op drie manieren om verkiezingsprogramma's doorzoekbaar te maken:
+
+### 1. Document Embeddings (Seeding)
+
+Tijdens het seeden van de database worden alle PDF's verwerkt:
+
+- **Locatie**: [`app/prisma/seed.ts`](app/prisma/seed.ts) (regel ~54-60, 117-120)
+- **Model**: OpenAI `text-embedding-3-small`
+- **Proces**: Elk document wordt opgesplitst in chunks van ~1000 karakters en omgezet naar vector embeddings die worden opgeslagen in PostgreSQL met pgvector
+
+### 2. Semantisch Zoeken (Vector Similarity)
+
+Bij elke zoekopdracht wordt de query omgezet naar een vector embedding en vergeleken met document embeddings:
+
+- **Locatie**: [`app/src/app/api/search/route.ts`](app/src/app/api/search/route.ts) (regel ~286-289, 75-90)
+- **Model**: OpenAI `text-embedding-3-small`
+- **Proces**: De top 50 meest relevante chunks per partij worden opgehaald via cosine similarity search
+
+### 3. Standpunt Analyse (LLM)
+
+De gevonden chunks worden geanalyseerd door een LLM om gestructureerde standpunten te genereren:
+
+- **Locatie**: [`app/src/app/api/search/route.ts`](app/src/app/api/search/route.ts) (regel ~108-185, 188-192)
+- **Model**: OpenAI `gpt-5`
+- **Prompt**: De gedetailleerde instructies voor het analyseren staan op regel ~108
+- **Proces**: Het model selecteert relevante citaten, identificeert standpunten en structureert ze met titel, ondertitel en verbatim quotes
+
+**Het gedrag aanpassen**: Je kunt de prompt in `route.ts` aanpassen om te beïnvloeden hoe kritisch de selectie is, hoeveel standpunten worden geïdentificeerd, of hoe citaten worden gestructureerd.
+
+## Setup
 
 ### Vereisten
 
@@ -51,18 +99,7 @@ pnpm dev
 
 Navigeer naar [http://localhost:3000](http://localhost:3000)
 
-## Database
-
-Het project gebruikt PostgreSQL met de pgvector extensie voor vector embeddings. De database schema bevat:
-
-- **Party** - Politieke partijen met metadata
-- **Program** - Verkiezingsprogramma's (PDFs)
-- **Document** - Geparseerde pagina's met vector embeddings
-- **SearchResult** - Gecachte zoekresultaten
-- **Position** - Standpunten per partij
-- **Quote** - Citaten uit programma's
-
-## Scripts
+### Scripts
 
 ```bash
 pnpm dev      # Start development server met Turbopack
@@ -71,25 +108,6 @@ pnpm start    # Start productie server
 pnpm lint     # Check code met Biome
 pnpm format   # Format code met Biome
 ```
-
-## Structuur
-
-```
-app/
-├── prisma/           # Database schema en migraties
-├── programs/         # PDF verkiezingsprogramma's
-├── src/
-│   ├── app/          # Next.js App Router
-│   │   ├── api/      # API routes
-│   │   ├── search/   # Zoekpagina
-│   │   └── page.tsx  # Homepage
-│   └── lib/          # Utilities
-└── public/           # Statische assets
-```
-
-## Over dit project
-
-Zweefhulp helpt kiezers objectief en transparant te vergelijken wat verschillende politieke partijen zeggen over specifieke onderwerpen. Het project is volledig open source en maakt gebruik van publiek beschikbare verkiezingsprogramma's.
 
 ## Credits
 

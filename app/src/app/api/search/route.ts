@@ -182,7 +182,7 @@ STRIKTE REGELS:
 - Bij twijfel: weglaten
 - Antwoord ALLEEN met JSON, geen extra tekst`
 
-  // Generate analysis with LLM (using GPT-4o for better reasoning)
+  // Generate analysis with LLM
   const { text } = await generateText({
     model: openai('gpt-5'),
     prompt,
