@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const barlowCondensed = Barlow_Condensed({
+  variable: "--font-barlow-condensed",
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "Zweefhulp - Doorzoek verkiezingsprogramma's 2025",
+    default: "Zweefhulp — Doorzoek verkiezingsprogramma's met AI",
     template: "%s | Zweefhulp"
   },
   description: "Een AI-aangedreven zoektool om verkiezingsprogramma's van de Tweede Kamerverkiezingen 2025 semantisch te doorzoeken en vergelijken. Vind relevante standpunten op basis van betekenis, niet alleen exacte zoektermen.",
@@ -28,13 +29,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "nl_NL",
     url: "https://zweefhulp.nl",
-    title: "Zweefhulp - Doorzoek verkiezingsprogramma's 2025",
+    title: "Zweefhulp — Doorzoek verkiezingsprogramma's met AI",
     description: "Doorzoek alle verkiezingsprogramma's voor de Tweede Kamerverkiezingen 2025 met AI-aangedreven semantisch zoeken.",
     siteName: "Zweefhulp"
   },
   twitter: {
     card: "summary_large_image",
-    title: "Zweefhulp - Doorzoek verkiezingsprogramma's 2025",
+    title: "Zweefhulp — Doorzoek verkiezingsprogramma's met AI",
     description: "Doorzoek alle verkiezingsprogramma's voor de Tweede Kamerverkiezingen 2025 met AI-aangedreven semantisch zoeken.",
   }
 };
@@ -47,7 +48,7 @@ export default function RootLayout({
   return (
     <html lang="nl">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${barlowCondensed.variable} antialiased`}
       >
         {children}
       </body>

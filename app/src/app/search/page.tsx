@@ -59,7 +59,7 @@ function SearchContent() {
     if (query) {
       fetchResults(query)
       // Update page title with search query
-      document.title = `${query} - Zoekresultaten | Zweefhulp`
+      document.title = `${query} in verkiezingsprogramma's 2025 — Zweefhulp`
     }
   }, [query])
 
@@ -105,8 +105,10 @@ function SearchContent() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-6">
             {/* Logo */}
-            <Link href="/" className="text-2xl font-bold text-gray-800 hover:text-gray-600 transition-colors whitespace-nowrap">
-              Zweef<span className="text-blue-600">hulp</span>
+            <Link href="/" className="whitespace-nowrap">
+              <h2 className="text-2xl font-bold text-gray-800 hover:text-gray-600 transition-colors">
+                Zweef<span className="text-blue-600">hulp</span>
+              </h2>
             </Link>
             
             {/* Search Bar */}
@@ -133,8 +135,10 @@ function SearchContent() {
       <main className="max-w-5xl mx-auto px-4 py-8">
         {/* Search Query Display */}
         <div className="mb-8">
-          <p className="text-sm text-gray-600 mb-1">Zoekresultaten voor</p>
-          <h1 className="text-3xl font-normal text-gray-800">{query}</h1>
+          <h1 className="text-3xl font-bold text-gray-800">
+            <span className="block text-sm font-normal font-sans text-gray-600 mb-1">Verkiezingsprogramma's 2025 over</span>
+            {query}
+          </h1>
         </div>
 
         {loading && (

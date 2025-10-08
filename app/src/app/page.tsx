@@ -9,7 +9,7 @@ export default function Home() {
 
   useEffect(() => {
     // Ensure homepage has the correct title
-    document.title = 'Zweefhulp - Doorzoek verkiezingsprogramma\'s 2025'
+    document.title = 'Zweefhulp — Doorzoek verkiezingsprogramma\'s met AI'
   }, [])
 
   const handleSearch = (e: FormEvent) => {
@@ -33,7 +33,7 @@ export default function Home() {
             Zweef<span className="text-blue-600">hulp</span>
           </h1>
           <p className="text-gray-600 text-sm mt-3">
-            Doorzoek alle verkiezingsprogramma&apos;s voor de Tweede Kamerverkiezingen 2025
+            Doorzoek alle verkiezingsprogramma&apos;s voor de Tweede Kamerverkiezingen 2025 met AI
           </p>
         </div>
 
