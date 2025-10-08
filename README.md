@@ -63,8 +63,6 @@ De gevonden chunks worden geanalyseerd door een LLM om gestructureerde standpunt
 - **Prompt**: De gedetailleerde instructies voor het analyseren staan op regel ~108
 - **Proces**: Het model selecteert relevante citaten, identificeert standpunten en structureert ze met titel, ondertitel en verbatim quotes
 
-**Het gedrag aanpassen**: Je kunt de prompt in `route.ts` aanpassen om te beïnvloeden hoe kritisch de selectie is, hoeveel standpunten worden geïdentificeerd, of hoe citaten worden gestructureerd.
-
 ## Setup
 
 ### Vereisten
