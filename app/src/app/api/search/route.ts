@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@/generated/prisma'
 import { openai } from '@ai-sdk/openai'
 import { embed, generateText } from 'ai'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma-edge'
 
 async function analyzeParty(
   query: string,
