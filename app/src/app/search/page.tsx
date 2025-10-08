@@ -158,11 +158,6 @@ function SearchContent() {
                 {(() => {
                   const sortedParties = [...results.parties].sort((a, b) => b.count - a.count)
                   const maxCount = Math.max(...results.parties.map(p => p.count), 1)
-                  const hasResults = sortedParties.some(p => p.count > 0)
-                  
-                  if (!hasResults) {
-                    return <p className="text-gray-500 text-sm">Geen vermeldingen gevonden</p>
-                  }
                   
                   return sortedParties.map((party) => {
                     if (party.count === 0) return null
