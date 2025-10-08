@@ -85,7 +85,7 @@ async function analyzeParty(
     FROM "Document"
     WHERE "programId" = ${program.id}
     ORDER BY vector <=> ${vectorString}::vector
-    LIMIT 50
+    LIMIT 25
   `
 
   // If no results found
@@ -185,7 +185,7 @@ STRIKTE REGELS:
 
   // Generate analysis with LLM
   const { text } = await generateText({
-    model: openai('gpt-5'),
+    model: openai('gpt-5-nano'),
     prompt,
     temperature: 0.2,
   })
