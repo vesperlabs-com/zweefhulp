@@ -33,7 +33,21 @@ Het project gebruikt PostgreSQL met de pgvector extensie voor vector embeddings.
 
 ### Verkiezingsprogramma's
 
-Alle verkiezingsprogramma's zijn gedownload op **6 oktober 2025** van de officiële websites van de politieke partijen. Ze zijn niet aangepast en opgeslagen in de [`app/programs/`](app/programs/) directory. Deze worden tijdens het seeden verwerkt en geïndexeerd in de database.
+Alle verkiezingsprogramma's zijn gedownload op **6 oktober 2025** van de officiële websites van de politieke partijen. Ze zijn niet aangepast en opgeslagen in de [`app/programs/`](app/programs/) directory.
+
+### Seeding
+
+Het seeding proces ([`app/prisma/seed.ts`](app/prisma/seed.ts)) verwerkt alle PDF's en maakt de database doorzoekbaar:
+
+1. **Party records** aanmaken voor elke politieke partij
+2. **Program records** aanmaken die PDFs koppelen aan partijen
+3. **PDF verwerking** per programma:
+   - Laden met LangChain's PDFLoader
+   - Opsplitsen in chunks (~1000 karakters, 200 overlap)
+   - Embeddings genereren via OpenAI `text-embedding-3-small`
+   - Opslaan in Document tabel met pgvector
+
+**Kosten**: ~€0.10-0.40 voor alle 18 programma's (±$0.02 per 1M tokens)
 
 ## AI
 
@@ -87,15 +101,20 @@ pnpm install
 cp .env.example .env
 # Voeg je DATABASE_URL en OPENAI_API_KEY toe aan .env
 
-# Setup database
+# Setup database en seed met verkiezingsprogramma's
 pnpm prisma migrate deploy
-pnpm prisma db seed
+pnpm prisma db seed  # Verwerkt alle PDFs (~10-30 min)
 
 # Start development server
 pnpm dev
 ```
 
 Navigeer naar [http://localhost:3000](http://localhost:3000)
+
+**Troubleshooting**:
+- **OPENAI_API_KEY niet gevonden**: Check je `.env` bestand
+- **vector type bestaat niet**: Zorg dat pgvector extensie is ingeschakeld in je database
+- **Memory errors bij seeding**: Programma's worden al sequentieel verwerkt, maar je kunt ze handmatig in batches doen door `seed.ts` aan te passen
 
 ### Scripts
 
