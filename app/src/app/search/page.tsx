@@ -62,7 +62,7 @@ function SearchContent() {
     if (query) {
       fetchResults(query)
       // Update page title with search query
-      document.title = `${query} in verkiezingsprogramma's 2025 — Zweefhulp`
+      document.title = `${query.charAt(0).toUpperCase() + query.slice(1)} in verkiezingsprogramma's 2025 — Zweefhulp`
     }
   }, [query])
 
