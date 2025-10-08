@@ -29,19 +29,19 @@ type SearchResults = {
 
 const LOADING_MESSAGES = [
   'Even koffie halen voor de Tweede Kamer...',
-  'Politieke streepjes aan het tellen (zonder regeerakkoord)...',
+  'Politieke streepjes aan het tellen...',
   'Coalitieonderhandelingen aan het speedrunnen...',
-  'Verkiezingsbeloftes aan het feit-checken... dit kan even duren...',
-  'Standpunten aan het vergelijken (zonder ruzie te maken)...',
+  'Verkiezingsbeloftes aan het feit-checken...',
+  'Standpunten aan het vergelijken...',
   'Debatleden aan het briefen over jouw vraag...',
   'Compromissen aan het pre-kauwen voor je...',
-  'Even de Kieswet nalezen... grapje, dit gaat sneller...',
-  'Programmapunten zoeken met een vergrootglas... 🔍',
-  'Stemhokjes aan het opbouwen (digitaal dan)...',
+  'Even de Kieswet nalezen...',
+  'Programmapunten zoeken met een vergrootglas...',
+  'Stemhokjes aan het opbouwen...',
   'Fractieleden aan het wakker maken...',
   'Even overleggen met het pluche...',
-  'Kamerzetels aan het tellen alsof het Black Friday is...',
-  'Wacht, eerst even applaus voor de democratie... 👏',
+  'Achterkamertjes even raadplegen...',
+  'Applaus voor de democratie optrommelen...',
 ]
 
 function SearchContent() {
@@ -247,7 +247,7 @@ function SearchContent() {
                           ))}
                         </div>
                       ) : (
-                        <p className="text-gray-600 text-sm">Geen relevante vermeldingen gevonden in dit programma.</p>
+                        <p className="text-gray-600 text-sm">Geen resultaten gevonden</p>
                       )}
                     </div>
                   )
