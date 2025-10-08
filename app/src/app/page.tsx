@@ -2,25 +2,17 @@
 
 import { useState, FormEvent, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function Home() {
   const [query, setQuery] = useState('')
   const router = useRouter()
-
-  useEffect(() => {
-    // Ensure homepage has the correct title
-    document.title = 'Zweefhulp — Doorzoek verkiezingsprogramma\'s met AI'
-  }, [])
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
     if (query.trim()) {
       router.push(`/search?q=${encodeURIComponent(query.trim())}`)
     }
-  }
-
-  const searchTerm = (term: string) => {
-    router.push(`/search?q=${encodeURIComponent(term)}`)
   }
 
   return (
@@ -70,13 +62,12 @@ export default function Home() {
               'asielzoekers',
               'europa'
             ].map((term) => (
-              <button
+              <Link href={`/search?q=${term}`}
                 key={term}
-                onClick={() => searchTerm(term)}
                 className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-full text-sm border border-gray-200 transition-colors"
               >
                 {term}
-              </button>
+                </Link>
             ))}
           </div>
         </div>
