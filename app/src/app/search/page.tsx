@@ -161,7 +161,7 @@ function SearchContent() {
           <>
             {/* Frequency Chart */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-              <h2 className="text-lg font-medium text-gray-800 mb-6">Frequentie van vermeldingen</h2>
+              <h2 className="text-lg font-medium text-gray-800 mb-6">Aantal citaten per partij</h2>
               
               <div className="flex items-end justify-start gap-3 overflow-x-auto pb-2 pt-2" style={{ height: '360px' }}>
                 {(() => {
@@ -214,12 +214,12 @@ function SearchContent() {
                       className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-24"
                     >
                       <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className="text-xl font-medium text-gray-800">{partyResult.party}</h3>
-                          <p className="text-sm text-gray-500 mt-1">
-                            {partyResult.count} vermelding{partyResult.count !== 1 ? 'en' : ''} gevonden
-                          </p>
-                        </div>
+                          <div>
+                            <h3 className="text-xl font-medium text-gray-800">{partyResult.party}</h3>
+                            <p className="text-sm text-gray-500 mt-1">
+                              {partyResult.count} citaa{partyResult.count !== 1 ? 'ten' : 't'}
+                            </p>
+                          </div>
                         <a
                           href={partyResult.website}
                           target="_blank"
@@ -251,7 +251,7 @@ function SearchContent() {
                           ))}
                         </div>
                       ) : (
-                        <p className="text-gray-600 text-sm">Geen resultaten gevonden</p>
+                        <p className="text-gray-600 text-sm">Geen citaten gevonden</p>
                       )}
                     </div>
                   )
