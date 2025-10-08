@@ -120,7 +120,6 @@ KWALITEIT BOVEN KWANTITEIT:
 - Als er maar 1-2 echte standpunten zijn: geef alleen die
 - Als fragmenten te vaag zijn: negeer ze
 - Als quotes elkaar herhalen: kies de beste
-- Maximaal 3 standpunten, maximaal 3 quotes per standpunt
 - Als er NIETS echt relevants is: return lege array
 
 STRUCTUUR VAN ELK STANDPUNT:
@@ -181,6 +180,10 @@ STRIKTE REGELS:
 - Titel = het standpunt, Subtitle = de context/redenering
 - Alleen substantiële, concrete standpunten
 - Bij twijfel: weglaten
+- ZOEKOPDRACHT MOET IN QUOTE VOORKOMEN: De zoekopdracht "${query}" (of een duidelijk synoniem/variatie) moet letterlijk in de quote voorkomen
+  * Geldig: "startup" kan zijn "start-ups", "start ups", "start- en scale-ups"
+  * NIET geldig: gerelateerde maar ANDERE concepten zoals "startup" → "ZZP", "zzp'er", "ondernemer"
+  * Als de zoekopdracht niet voorkomt in de quote: NIET selecteren
 - Antwoord ALLEEN met JSON, geen extra tekst`
 
   // Generate analysis with LLM
