@@ -25,6 +25,11 @@ export const metadata: Metadata = {
     { name: "Stefan Borsje", url: "https://stefanborsje.com/" }
   ],
   creator: "Robert Gaal & Stefan Borsje",
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
   openGraph: {
     type: "website",
     locale: "nl_NL",

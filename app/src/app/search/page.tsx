@@ -108,7 +108,8 @@ function SearchContent() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-6">
             {/* Logo */}
-            <Link href="/" className="whitespace-nowrap">
+            <Link href="/" className="whitespace-nowrap flex items-center gap-2">
+              <img src="/icon.svg" alt="Zweefhulp" width={16} height={16} />
               <h2 className="text-2xl font-bold text-gray-800 hover:text-gray-600 transition-colors">
                 Zweef<span className="text-blue-600">hulp</span>
               </h2>

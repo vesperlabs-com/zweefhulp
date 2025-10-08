@@ -24,6 +24,9 @@ export default function Home() {
       <div className="flex-grow flex flex-col items-center justify-center w-full px-4">
         {/* Logo and Title */}
         <div className="text-center mb-8">
+          <div className="flex justify-center">
+            <img src="/icon.svg" alt="Zweefhulp" width={30} height={30} />
+          </div>
           <h1 className="text-6xl font-bold text-gray-800 mb-2">
             Zweef<span className="text-blue-600">hulp</span>
           </h1>
