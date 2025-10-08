@@ -58,6 +58,8 @@ function SearchContent() {
   useEffect(() => {
     if (query) {
       fetchResults(query)
+      // Update page title with search query
+      document.title = `${query} - Zoekresultaten | Zweefhulp`
     }
   }, [query])
 

@@ -1,11 +1,16 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function Home() {
   const [query, setQuery] = useState('')
   const router = useRouter()
+
+  useEffect(() => {
+    // Ensure homepage has the correct title
+    document.title = 'Zweefhulp - Doorzoek verkiezingsprogramma\'s 2025'
+  }, [])
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
