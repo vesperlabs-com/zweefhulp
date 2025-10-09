@@ -76,7 +76,7 @@ Bij elke zoekopdracht wordt de query omgezet naar een vector embedding en vergel
 De gevonden chunks worden geanalyseerd door een LLM om gestructureerde standpunten te genereren:
 
 - **Locatie**: [`app/src/app/api/search/route.ts`](app/src/app/api/search/route.ts) (regel ~108-185, 188-192)
-- **Model**: OpenAI `gpt-5`
+- **Model**: OpenAI `gpt-4.1`
 - **Prompt**: De gedetailleerde instructies voor het analyseren staan op regel ~108
 - **Proces**: Het model selecteert relevante citaten, identificeert standpunten en structureert ze met titel, ondertitel en verbatim quotes
 
