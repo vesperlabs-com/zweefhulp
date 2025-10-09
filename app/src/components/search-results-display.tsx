@@ -1,6 +1,7 @@
 'use client'
 
 import { getPartyLogo, PARTIES } from '@/lib/party-data'
+import { useFavorites } from '@/hooks/use-favorites'
 
 type Quote = {
   text: string
@@ -39,6 +40,8 @@ export default function SearchResultsDisplay({
   sortMode,
   onSortModeChange
 }: SearchResultsDisplayProps) {
+  const { toggleFavorite, isFavorite } = useFavorites()
+  
   // Defensive check: ensure parties array exists
   if (!results?.parties || !Array.isArray(results.parties)) {
     return (
@@ -49,10 +52,18 @@ export default function SearchResultsDisplay({
   }
 
   const sortedParties = [...results.parties].sort((a, b) => {
+    // Favorites first
+    const aIsFav = isFavorite(a.party)
+    const bIsFav = isFavorite(b.party)
+    
+    if (aIsFav && !bIsFav) return -1
+    if (!aIsFav && bIsFav) return 1
+    
+    // Then current sort mode
     if (sortMode === 'alphabetical') {
       return a.party.localeCompare(b.party)
     }
-    return b.count - a.count // relevance by count
+    return b.count - a.count
   })
 
   // Get PDF URL for a party with page anchor
@@ -103,7 +114,7 @@ export default function SearchResultsDisplay({
         <div className="flex bg-gray-100 rounded-lg p-1 gap-1 whitespace-nowrap">
           <button
             onClick={() => onSortModeChange('relevance')}
-            className={`px-3 py-1.5 text-sm font-medium rounded transition-all ${
+            className={`px-3 py-1.5 text-sm font-medium rounded transition-all cursor-pointer ${
               sortMode === 'relevance'
                 ? 'bg-white text-gray-900 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
@@ -113,7 +124,7 @@ export default function SearchResultsDisplay({
           </button>
           <button
             onClick={() => onSortModeChange('alphabetical')}
-            className={`px-3 py-1.5 text-sm font-medium rounded transition-all ${
+            className={`px-3 py-1.5 text-sm font-medium rounded transition-all cursor-pointer ${
               sortMode === 'alphabetical'
                 ? 'bg-white text-gray-900 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
@@ -138,19 +149,34 @@ export default function SearchResultsDisplay({
             >
               <div className="mb-4">
                 <div className="flex items-center gap-3 mb-2">
-                  <a
-                    href={partyResult.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-gray-800 hover:text-gray-600 transition-colors"
-                  >
-                    <img 
-                      src={getPartyLogo(partyResult.party)} 
-                      alt={partyResult.party}
-                      className={`h-10 w-auto ${!hasResults ? 'grayscale opacity-50' : ''}`}
-                    />
-                    <h2 className="text-xl font-medium">{partyResult.party}</h2>
-                  </a>
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={partyResult.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 text-gray-800 hover:text-gray-600 transition-colors"
+                    >
+                      <img 
+                        src={getPartyLogo(partyResult.party)} 
+                        alt={partyResult.party}
+                        className={`h-10 w-auto ${!hasResults ? 'grayscale opacity-50' : ''}`}
+                      />
+                      <h2 className="text-xl font-medium">{partyResult.party}</h2>
+                    </a>
+                    <button 
+                      onClick={() => toggleFavorite(partyResult.party)}
+                      className={`transition-colors p-1 cursor-pointer ${
+                        isFavorite(partyResult.party) 
+                          ? 'text-yellow-500 hover:text-yellow-600' 
+                          : 'text-gray-400 hover:text-yellow-500'
+                      }`}
+                      title={isFavorite(partyResult.party) ? "Uit favorieten" : "Aan favorieten toevoegen"}
+                    >
+                      <svg className="w-5 h-5" fill={isFavorite(partyResult.party) ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
                 {hasResults && partyResult.summary && (
                   <p className="text-sm text-gray-600">

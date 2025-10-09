@@ -9,6 +9,7 @@ Een AI-aangedreven zoektool om verkiezingsprogramma's van de Tweede Kamerverkiez
 - **Semantisch zoeken** - Vind relevante standpunten op basis van betekenis, niet alleen exacte zoektermen
 - **Visuele vergelijking** - Zie in één oogopslag wat de verschillende standpunten zijn over jouw onderwerp
 - **Directe citaten** - Lees de exacte tekst uit de verkiezingsprogramma's met paginanummers
+- **Favorieten** - Markeer partijen als favoriet en zie ze bovenaan in zoekresultaten
 
 ## Technologie
 
