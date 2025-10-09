@@ -30,9 +30,10 @@ export async function generateMetadata({
       title,
       description,
       url: `https://zweefhulp.nl/search?q=${encodeURIComponent(query).replace(/%20/g, '+')}`,
+      images: ["/banner.png"]
     },
     twitter: {
-      card: 'summary_large_image',
+      card: 'summary',
       title,
       description,
     }

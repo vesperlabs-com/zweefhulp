@@ -36,10 +36,11 @@ export const metadata: Metadata = {
     url: "https://zweefhulp.nl",
     title: "Zweefhulp — Doorzoek verkiezingsprogramma's met AI",
     description: "Doorzoek alle verkiezingsprogramma's voor de Tweede Kamerverkiezingen 2025 met AI-aangedreven semantisch zoeken.",
-    siteName: "Zweefhulp"
+    siteName: "Zweefhulp",
+    images: ["/banner.png"]
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Zweefhulp — Doorzoek verkiezingsprogramma's met AI",
     description: "Doorzoek alle verkiezingsprogramma's voor de Tweede Kamerverkiezingen 2025 met AI-aangedreven semantisch zoeken.",
   }
