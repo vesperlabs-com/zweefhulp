@@ -194,7 +194,6 @@ export default function SearchPageClient() {
             <div className="sticky top-[70px] z-10 -mx-4 px-4 py-3 bg-gray-50/95 backdrop-blur-sm border-y border-gray-200 mb-6">
               <div className="flex justify-evenly overflow-x-auto scrollbar-hide py-2">
                 {results.parties
-                  .filter(p => p.positions.length > 0)
                   .sort((a, b) => {
                     if (sortMode === 'alphabetical') {
                       return a.party.localeCompare(b.party)
@@ -203,6 +202,7 @@ export default function SearchPageClient() {
                   })
                   .map((partyResult) => {
                     const partyId = partyResult.short.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '')
+                    const hasResults = partyResult.positions.length > 0
                     
                     return (
                       <a
@@ -214,7 +214,7 @@ export default function SearchPageClient() {
                         <img 
                           src={getPartyLogo(partyResult.party)} 
                           alt={partyResult.party}
-                          className="h-10 w-10 rounded-full object-cover"
+                          className={`h-10 w-10 rounded-full object-cover ${!hasResults ? 'opacity-30 grayscale' : ''}`}
                         />
                       </a>
                     )
@@ -225,7 +225,6 @@ export default function SearchPageClient() {
             {/* Party Results */}
             <div className="space-y-6">
               {results.parties
-                .filter(p => p.positions.length > 0)
                 .sort((a, b) => {
                   if (sortMode === 'alphabetical') {
                     return a.party.localeCompare(b.party)
@@ -234,12 +233,13 @@ export default function SearchPageClient() {
                 })
                 .map((partyResult) => {
                   const partyId = partyResult.short.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '')
+                  const hasResults = partyResult.positions.length > 0
                   
                   return (
                     <div 
                       key={partyResult.party} 
                       id={partyId}
-                      className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-[160px]"
+                      className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-[160px] ${!hasResults ? 'opacity-60' : ''}`}
                     >
                       <div className="mb-4">
                         <div className="flex items-start justify-between mb-2">
@@ -247,7 +247,7 @@ export default function SearchPageClient() {
                             <img 
                               src={getPartyLogo(partyResult.party)} 
                               alt={partyResult.party}
-                              className="h-10 w-auto"
+                              className={`h-10 w-auto ${!hasResults ? 'grayscale opacity-50' : ''}`}
                             />
                             <h3 className="text-xl font-medium text-gray-800">{partyResult.party}</h3>
                           </div>
@@ -268,24 +268,33 @@ export default function SearchPageClient() {
                             {partyResult.summary}
                           </p>
                         )}
+                        {!hasResults && (
+                          <div className="mt-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                            <p className="text-sm text-gray-600 italic">
+                              Deze partij noemt dit onderwerp niet expliciet in hun verkiezingsprogramma.
+                            </p>
+                          </div>
+                        )}
                       </div>
                       
-                      <div className="space-y-5">
-                        {partyResult.positions.map((position, idx) => (
-                          <div key={idx} className="border-l-2 border-blue-500 pl-4">
-                            <h4 className="font-medium text-gray-800 mb-1">{position.title}</h4>
-                            <p className="text-sm text-gray-600 mb-3">{position.subtitle}</p>
-                            <div className="space-y-2">
-                              {position.quotes.map((quote, qIdx) => (
-                                <div key={qIdx} className="text-sm text-gray-700 italic bg-gray-50 p-3 rounded">
-                                  <p>&ldquo;{quote.text}&rdquo;</p>
-                                  <p className="text-xs text-gray-500 mt-1">Pagina {quote.page}</p>
-                                </div>
-                              ))}
+                      {hasResults && (
+                        <div className="space-y-5">
+                          {partyResult.positions.map((position, idx) => (
+                            <div key={idx} className="border-l-2 border-blue-500 pl-4">
+                              <h4 className="font-medium text-gray-800 mb-1">{position.title}</h4>
+                              <p className="text-sm text-gray-600 mb-3">{position.subtitle}</p>
+                              <div className="space-y-2">
+                                {position.quotes.map((quote, qIdx) => (
+                                  <div key={qIdx} className="text-sm text-gray-700 italic bg-gray-50 p-3 rounded">
+                                    <p>&ldquo;{quote.text}&rdquo;</p>
+                                    <p className="text-xs text-gray-500 mt-1">Pagina {quote.page}</p>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )
                 })}
