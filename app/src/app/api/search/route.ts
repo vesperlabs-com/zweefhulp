@@ -6,16 +6,29 @@ import { prisma } from '@/lib/prisma-edge'
 /**
  * Parse markdown format to standpunten structure
  * Expected format:
+ * ### Samenvatting
+ * Summary text here (3-4 sentences)
+ * 
  * ## Heading
  * Explanation paragraph
  * - "quote" (pagina X)
  * - "quote" (pagina Y)
  */
-function parseMarkdownToStandpunten(markdown: string): { standpunten: Array<{
-  title: string
-  subtitle: string
-  quotes: Array<{ text: string; page: number }>
-}> } {
+function parseMarkdownToStandpunten(markdown: string): { 
+  summary: string
+  standpunten: Array<{
+    title: string
+    subtitle: string
+    quotes: Array<{ text: string; page: number }>
+  }> 
+} {
+  // Extract summary (### Samenvatting section)
+  let summary = ''
+  const summaryMatch = markdown.match(/###\s*Samenvatting\s*\n([\s\S]*?)(?=\n##|$)/)
+  if (summaryMatch) {
+    summary = summaryMatch[1].trim()
+  }
+
   const standpunten: Array<{
     title: string
     subtitle: string
@@ -73,7 +86,7 @@ function parseMarkdownToStandpunten(markdown: string): { standpunten: Array<{
     }
   }
 
-  return { standpunten }
+  return { summary, standpunten }
 }
 
 async function analyzeParty(
@@ -93,6 +106,7 @@ async function analyzeParty(
       short: party?.shortName || 'Unknown',
       count: 0,
       website: party?.website || '#',
+      summary: '',
       standpunten: []
     }
   }
@@ -135,6 +149,7 @@ async function analyzeParty(
       short: party.shortName || party.name,
       count,
       website: party.website || '#',
+      summary: cachedResult.summary,
       standpunten
     }
   }
@@ -168,6 +183,7 @@ async function analyzeParty(
       short: party.shortName || party.name,
       count: 0,
       website: party.website || '#',
+      summary: '',
       standpunten: []
     }
   }
@@ -183,7 +199,18 @@ Hieronder staan tekst fragmenten uit het ${party.name} verkiezingsprogramma. De 
 
 ${chunksContext}
 
-KRITISCHE ANALYSE VEREIST:
+EERSTE STAP - SCHRIJF EEN SAMENVATTING:
+Begin je antwoord met een "### Samenvatting" sectie (3-4 zinnen) die:
+1. Het algemene standpunt van ${party.name} over "${query}" samenvat
+2. De belangrijkste concrete beleidsvoorstellen noemt
+3. De kern van hun visie helder maakt
+4. Toegankelijk en begrijpelijk is voor kiezers
+
+Voorbeeld formaat:
+### Samenvatting
+[3-4 zinnen hier die het standpunt synthetiseren en de belangrijkste voorstellen benoemen]
+
+TWEEDE STAP - KRITISCHE ANALYSE VEREIST:
 1. Beoordeel elk fragment op echte relevantie voor "${query}". Vage of algemene uitspraken NIET includeren.
 2. Identificeer DUIDELIJK VERSCHILLENDE standpunten/posities over "${query}"
 3. Als quotes hetzelfde zeggen of hetzelfde aspect behandelen: groepeer ze onder 1 standpunt
@@ -222,6 +249,10 @@ ELK STANDPUNT HEEFT:
    - Alleen quotes die dit specifieke standpunt ondersteunen
 
 VERPLICHTE markdown structuur:
+### Samenvatting
+
+[3-4 zinnen die het algemene standpunt en belangrijkste voorstellen samenvatten]
+
 ## [Standpunt 1 titel]
 
 [Korte uitleg over dit standpunt in 2-3 zinnen, met context en redenering]
@@ -261,6 +292,7 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
       short: party.shortName || party.name,
       count: 0,
       website: party.website || '#',
+      summary: '',
       standpunten: []
     }
   }
@@ -294,6 +326,7 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
       data: {
         query,
         partyId: party.id,
+        summary: parsedResponse.summary,
         positions: {
           create: parsedResponse.standpunten.map((standpunt: any, idx: number) => ({
             title: standpunt.title,
@@ -320,6 +353,7 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
     short: party.shortName || party.name,
     count: totalCount,
     website: party.website || '#',
+    summary: parsedResponse.summary,
     standpunten: parsedResponse.standpunten
   }
 }

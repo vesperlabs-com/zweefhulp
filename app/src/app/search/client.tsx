@@ -21,6 +21,7 @@ type PartyResult = {
   short: string
   count: number
   website: string
+  summary: string
   standpunten: Standpunt[]
 }
 
@@ -262,9 +263,11 @@ export default function SearchPageClient() {
                             </svg>
                           </a>
                         </div>
-                        <p className="text-sm text-gray-600">
-                          {/* TODO */} Samenvatting van de standpunten komt hier
-                        </p>
+                        {partyResult.summary && (
+                          <p className="text-sm text-gray-600">
+                            {partyResult.summary}
+                          </p>
+                        )}
                       </div>
                       
                       <div className="space-y-5">
