@@ -32,9 +32,10 @@ type SearchResults = {
 type SearchPageWrapperProps = {
   results: SearchResults
   query: string
+  initialFavorites?: string[]
 }
 
-export default function SearchPageWrapper({ results, query }: SearchPageWrapperProps) {
+export default function SearchPageWrapper({ results, query, initialFavorites }: SearchPageWrapperProps) {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState(query)
   const [sortMode, setSortMode] = useState<'relevance' | 'alphabetical'>('relevance')
@@ -124,6 +125,7 @@ export default function SearchPageWrapper({ results, query }: SearchPageWrapperP
           results={results}
           query={query}
           sortMode={sortMode}
+          initialFavorites={initialFavorites}
         />
       </main>
 

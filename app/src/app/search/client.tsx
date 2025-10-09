@@ -181,12 +181,41 @@ export default function SearchPageClient() {
         })()}
 
         {!loading && !error && results && (
-          <SearchResultsDisplay
-            results={results}
-            query={query}
-            sortMode={sortMode}
-            onSortModeChange={setSortMode}
-          />
+          <>
+            {/* Sort Toggle */}
+            <div className="mb-8 flex justify-end">
+              <div className="flex bg-gray-100 rounded-lg p-1 gap-1 whitespace-nowrap">
+                <button
+                  type="button"
+                  onClick={() => setSortMode('relevance')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded transition-all cursor-pointer ${
+                    sortMode === 'relevance'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Relevantie
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSortMode('alphabetical')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded transition-all cursor-pointer ${
+                    sortMode === 'alphabetical'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  A-Z
+                </button>
+              </div>
+            </div>
+
+            <SearchResultsDisplay
+              results={results}
+              query={query}
+              sortMode={sortMode}
+            />
+          </>
         )}
       </main>
 

@@ -31,14 +31,16 @@ type SearchResultsDisplayProps = {
   results: SearchResults
   query: string
   sortMode: 'relevance' | 'alphabetical'
+  initialFavorites?: string[]
 }
 
 export default function SearchResultsDisplay({
   results,
   query,
-  sortMode
+  sortMode,
+  initialFavorites
 }: SearchResultsDisplayProps) {
-  const { toggleFavorite, isFavorite } = useFavorites()
+  const { toggleFavorite, isFavorite } = useFavorites(initialFavorites)
   
   // Defensive check: ensure parties array exists
   if (!results?.parties || !Array.isArray(results.parties)) {
