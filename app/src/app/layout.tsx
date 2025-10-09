@@ -30,6 +30,9 @@ export const metadata: Metadata = {
     shortcut: '/icon.svg',
     apple: '/icon.svg',
   },
+  other: {
+    'theme-color': '#0a0a0a',
+  },
   openGraph: {
     type: "website",
     locale: "nl_NL",
