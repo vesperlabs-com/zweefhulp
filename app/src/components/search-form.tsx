@@ -34,7 +34,8 @@ export function SearchForm() {
           />
         </svg>
         <input
-          type="text"
+          type="search"
+          autoCapitalize='none'
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Zoek op thema's, interesses, of onderwerpen..."
