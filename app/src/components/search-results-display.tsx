@@ -59,6 +59,15 @@ export default function SearchResultsDisplay({
   const getPdfUrl = (partyName: string, pageNumber: number) => {
     const partyData = PARTIES[partyName]
     if (!partyData) return '#'
+    
+    // Use environment variable for blob storage base URL
+    const blobBaseUrl = process.env.NEXT_PUBLIC_BLOB_BASE_URL
+    
+    if (blobBaseUrl) {
+      return `${blobBaseUrl}/${partyData.program.fileName}#page=${pageNumber}`
+    }
+    
+    // Fallback to local files
     return `/programs/${partyData.program.fileName}#page=${pageNumber}`
   }
 
