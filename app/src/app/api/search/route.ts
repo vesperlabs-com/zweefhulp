@@ -278,7 +278,7 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
   const { text } = await generateText({
     model: openai('gpt-4.1'),
     prompt,
-    temperature: 0.2,
+    temperature: 0.1,
   })
 
   // Parse the markdown response
