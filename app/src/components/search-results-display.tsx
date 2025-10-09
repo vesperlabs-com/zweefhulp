@@ -39,6 +39,15 @@ export default function SearchResultsDisplay({
   sortMode,
   onSortModeChange
 }: SearchResultsDisplayProps) {
+  // Defensive check: ensure parties array exists
+  if (!results?.parties || !Array.isArray(results.parties)) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-700">
+        Geen geldige zoekresultaten ontvangen
+      </div>
+    )
+  }
+
   const sortedParties = [...results.parties].sort((a, b) => {
     if (sortMode === 'alphabetical') {
       return a.party.localeCompare(b.party)
@@ -60,7 +69,7 @@ export default function SearchResultsDisplay({
         <div className="flex justify-evenly overflow-x-auto scrollbar-hide py-2 gap-x-1">
           {sortedParties.map((partyResult) => {
             const partyId = partyResult.short.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '')
-            const hasResults = partyResult.positions.length > 0
+            const hasResults = partyResult.positions?.length > 0
             
             return (
               <a
@@ -110,7 +119,7 @@ export default function SearchResultsDisplay({
       <div className="space-y-6">
         {sortedParties.map((partyResult) => {
           const partyId = partyResult.short.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '')
-          const hasResults = partyResult.positions.length > 0
+          const hasResults = partyResult.positions?.length > 0
           
           return (
             <div 
@@ -146,14 +155,14 @@ export default function SearchResultsDisplay({
                 )}
               </div>
               
-              {hasResults && (
+              {hasResults && partyResult.positions && (
                 <div className="space-y-5">
                   {partyResult.positions.map((position, idx) => (
                     <div key={idx} className="border-l-2 border-blue-500 pl-4">
                       <h4 className="font-medium text-gray-800 mb-1">{position.title}</h4>
                       <p className="text-sm text-gray-600 mb-3">{position.subtitle}</p>
                       <div className="space-y-2">
-                        {position.quotes.map((quote, qIdx) => (
+                        {position.quotes?.map((quote, qIdx) => (
                           <div key={qIdx} className="text-sm text-gray-700 italic bg-gray-50 p-3 rounded">
                             <p>&ldquo;{quote.text}&rdquo;</p>
                             <p className="text-xs text-gray-500 mt-1">

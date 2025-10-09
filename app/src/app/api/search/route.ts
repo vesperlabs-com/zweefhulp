@@ -299,8 +299,8 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
 
   // Deduplicate quotes across all positions
   const seenQuotes = new Set<string>()
-  parsedResponse.positions = parsedResponse.positions.map((position: any) => {
-    const uniqueQuotes = position.quotes.filter((quote: any) => {
+  parsedResponse.positions = (parsedResponse.positions || []).map((position: any) => {
+    const uniqueQuotes = (position.quotes || []).filter((quote: any) => {
       const key = `${quote.text.trim().toLowerCase()}|${quote.page}`
       if (seenQuotes.has(key)) {
         return false // Skip duplicate
@@ -312,11 +312,11 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
       ...position,
       quotes: uniqueQuotes
     }
-  }).filter((position: any) => position.quotes.length > 0) // Remove positions with no quotes left
+  }).filter((position: any) => position.quotes?.length > 0) // Remove positions with no quotes left
 
   // Calculate total count (number of quotes)
   const totalCount = parsedResponse.positions.reduce(
-    (sum: number, s: any) => sum + s.quotes.length,
+    (sum: number, s: any) => sum + (s.quotes?.length || 0),
     0
   )
 
