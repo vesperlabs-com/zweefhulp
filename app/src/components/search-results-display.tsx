@@ -1,6 +1,6 @@
 'use client'
 
-import { getPartyLogo } from '@/lib/party-data'
+import { getPartyLogo, PARTIES } from '@/lib/party-data'
 
 type Quote = {
   text: string
@@ -45,6 +45,13 @@ export default function SearchResultsDisplay({
     }
     return b.count - a.count // relevance by count
   })
+
+  // Get PDF URL for a party with page anchor
+  const getPdfUrl = (partyName: string, pageNumber: number) => {
+    const partyData = PARTIES[partyName]
+    if (!partyData) return '#'
+    return `/programs/${partyData.program.fileName}#page=${pageNumber}`
+  }
 
   return (
     <>
@@ -112,25 +119,19 @@ export default function SearchResultsDisplay({
               className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-[160px] ${!hasResults ? 'opacity-60' : ''}`}
             >
               <div className="mb-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mb-2">
+                  <a
+                    href={partyResult.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 text-gray-800 hover:text-gray-600 transition-colors"
+                  >
                     <img 
                       src={getPartyLogo(partyResult.party)} 
                       alt={partyResult.party}
                       className={`h-10 w-auto ${!hasResults ? 'grayscale opacity-50' : ''}`}
                     />
-                    <h3 className="text-xl font-medium text-gray-800">{partyResult.party}</h3>
-                  </div>
-                  <a
-                    href={partyResult.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 transition-colors"
-                  >
-                    Lees meer
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
+                    <h2 className="text-xl font-medium">{partyResult.party}</h2>
                   </a>
                 </div>
                 {partyResult.summary && (
@@ -155,7 +156,16 @@ export default function SearchResultsDisplay({
                         {position.quotes.map((quote, qIdx) => (
                           <div key={qIdx} className="text-sm text-gray-700 italic bg-gray-50 p-3 rounded">
                             <p>&ldquo;{quote.text}&rdquo;</p>
-                            <p className="text-xs text-gray-500 mt-1">Pagina {quote.page}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              <a 
+                                href={getPdfUrl(partyResult.party, quote.page)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-700 hover:underline"
+                              >
+                                Pagina {quote.page}
+                              </a>
+                            </p>
                           </div>
                         ))}
                       </div>

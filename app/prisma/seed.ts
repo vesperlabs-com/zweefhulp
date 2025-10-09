@@ -46,7 +46,7 @@ async function processProgram(partyName: string) {
   })
 
   // Load PDF with custom pdfjs
-  const pdfPath = join(__dirname, '..', 'programs', partyData.program.fileName)
+  const pdfPath = join(__dirname, '..', 'public', 'programs', partyData.program.fileName)
   const loader = new PDFLoader(pdfPath, {
     pdfjs: () => import('pdfjs-dist'),
   })
