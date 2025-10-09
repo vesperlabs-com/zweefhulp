@@ -4,7 +4,7 @@ import { embed, generateText } from 'ai'
 import { prisma } from '@/lib/prisma-edge'
 
 /**
- * Parse markdown format to standpunten structure
+ * Parse markdown format to positions structure
  * Expected format:
  * ### Samenvatting
  * Summary text here (3-4 sentences)
@@ -14,9 +14,9 @@ import { prisma } from '@/lib/prisma-edge'
  * - "quote" (pagina X)
  * - "quote" (pagina Y)
  */
-function parseMarkdownToStandpunten(markdown: string): { 
+function parseMarkdownToPositions(markdown: string): { 
   summary: string
-  standpunten: Array<{
+  positions: Array<{
     title: string
     subtitle: string
     quotes: Array<{ text: string; page: number }>
@@ -29,7 +29,7 @@ function parseMarkdownToStandpunten(markdown: string): {
     summary = summaryMatch[1].trim()
   }
 
-  const standpunten: Array<{
+  const positions: Array<{
     title: string
     subtitle: string
     quotes: Array<{ text: string; page: number }>
@@ -76,9 +76,9 @@ function parseMarkdownToStandpunten(markdown: string): {
       }
     }
 
-    // Only add standpunt if it has quotes
+    // Only add position if it has quotes
     if (quotes.length > 0 && title && subtitle) {
-      standpunten.push({
+      positions.push({
         title,
         subtitle,
         quotes
@@ -86,7 +86,7 @@ function parseMarkdownToStandpunten(markdown: string): {
     }
   }
 
-  return { summary, standpunten }
+  return { summary, positions }
 }
 
 async function analyzeParty(
@@ -107,7 +107,7 @@ async function analyzeParty(
       count: 0,
       website: party?.website || '#',
       summary: '',
-      standpunten: []
+      positions: []
     }
   }
 
@@ -133,7 +133,7 @@ async function analyzeParty(
 
   // If cached, return formatted result
   if (cachedResult) {
-    const standpunten = cachedResult.positions.map(pos => ({
+    const positions = cachedResult.positions.map(pos => ({
       title: pos.title,
       subtitle: pos.subtitle,
       quotes: pos.quotes.map(q => ({
@@ -142,7 +142,7 @@ async function analyzeParty(
       }))
     }))
 
-    const count = standpunten.reduce((sum, s) => sum + s.quotes.length, 0)
+    const count = positions.reduce((sum, s) => sum + s.quotes.length, 0)
 
     return {
       party: party.name,
@@ -150,7 +150,7 @@ async function analyzeParty(
       count,
       website: party.website || '#',
       summary: cachedResult.summary,
-      standpunten
+      positions
     }
   }
 
@@ -184,7 +184,7 @@ async function analyzeParty(
       count: 0,
       website: party.website || '#',
       summary: '',
-      standpunten: []
+      positions: []
     }
   }
 
@@ -284,7 +284,7 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
   // Parse the markdown response
   let parsedResponse
   try {
-    parsedResponse = parseMarkdownToStandpunten(text)
+    parsedResponse = parseMarkdownToPositions(text)
   } catch (e) {
     console.error(`Failed to parse markdown response for ${party.name}:`, e)
     return {
@@ -293,14 +293,14 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
       count: 0,
       website: party.website || '#',
       summary: '',
-      standpunten: []
+      positions: []
     }
   }
 
-  // Deduplicate quotes across all standpunten
+  // Deduplicate quotes across all positions
   const seenQuotes = new Set<string>()
-  parsedResponse.standpunten = parsedResponse.standpunten.map((standpunt: any) => {
-    const uniqueQuotes = standpunt.quotes.filter((quote: any) => {
+  parsedResponse.positions = parsedResponse.positions.map((position: any) => {
+    const uniqueQuotes = position.quotes.filter((quote: any) => {
       const key = `${quote.text.trim().toLowerCase()}|${quote.page}`
       if (seenQuotes.has(key)) {
         return false // Skip duplicate
@@ -309,13 +309,13 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
       return true
     })
     return {
-      ...standpunt,
+      ...position,
       quotes: uniqueQuotes
     }
-  }).filter((standpunt: any) => standpunt.quotes.length > 0) // Remove standpunten with no quotes left
+  }).filter((position: any) => position.quotes.length > 0) // Remove positions with no quotes left
 
   // Calculate total count (number of quotes)
-  const totalCount = parsedResponse.standpunten.reduce(
+  const totalCount = parsedResponse.positions.reduce(
     (sum: number, s: any) => sum + s.quotes.length,
     0
   )
@@ -328,12 +328,12 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
         partyId: party.id,
         summary: parsedResponse.summary,
         positions: {
-          create: parsedResponse.standpunten.map((standpunt: any, idx: number) => ({
-            title: standpunt.title,
-            subtitle: standpunt.subtitle,
+          create: parsedResponse.positions.map((position: any, idx: number) => ({
+            title: position.title,
+            subtitle: position.subtitle,
             ordinal: idx + 1,
             quotes: {
-              create: standpunt.quotes.map((quote: any, qIdx: number) => ({
+              create: position.quotes.map((quote: any, qIdx: number) => ({
                 text: quote.text,
                 page: quote.page,
                 ordinal: qIdx + 1
@@ -354,7 +354,7 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
     count: totalCount,
     website: party.website || '#',
     summary: parsedResponse.summary,
-    standpunten: parsedResponse.standpunten
+    positions: parsedResponse.positions
   }
 }
 

@@ -10,7 +10,7 @@ type Quote = {
   page: number
 }
 
-type Standpunt = {
+type Position = {
   title: string
   subtitle: string
   quotes: Quote[]
@@ -22,7 +22,7 @@ type PartyResult = {
   count: number
   website: string
   summary: string
-  standpunten: Standpunt[]
+  positions: Position[]
 }
 
 type SearchResults = {
@@ -194,7 +194,7 @@ export default function SearchPageClient() {
             <div className="sticky top-[70px] z-10 -mx-4 px-4 py-3 bg-gray-50/95 backdrop-blur-sm border-y border-gray-200 mb-6">
               <div className="flex justify-evenly overflow-x-auto scrollbar-hide py-2">
                 {results.parties
-                  .filter(p => p.standpunten.length > 0)
+                  .filter(p => p.positions.length > 0)
                   .sort((a, b) => {
                     if (sortMode === 'alphabetical') {
                       return a.party.localeCompare(b.party)
@@ -225,7 +225,7 @@ export default function SearchPageClient() {
             {/* Party Results */}
             <div className="space-y-6">
               {results.parties
-                .filter(p => p.standpunten.length > 0)
+                .filter(p => p.positions.length > 0)
                 .sort((a, b) => {
                   if (sortMode === 'alphabetical') {
                     return a.party.localeCompare(b.party)
@@ -271,12 +271,12 @@ export default function SearchPageClient() {
                       </div>
                       
                       <div className="space-y-5">
-                        {partyResult.standpunten.map((standpunt, idx) => (
+                        {partyResult.positions.map((position, idx) => (
                           <div key={idx} className="border-l-2 border-blue-500 pl-4">
-                            <h4 className="font-medium text-gray-800 mb-1">{standpunt.title}</h4>
-                            <p className="text-sm text-gray-600 mb-3">{standpunt.subtitle}</p>
+                            <h4 className="font-medium text-gray-800 mb-1">{position.title}</h4>
+                            <p className="text-sm text-gray-600 mb-3">{position.subtitle}</p>
                             <div className="space-y-2">
-                              {standpunt.quotes.map((quote, qIdx) => (
+                              {position.quotes.map((quote, qIdx) => (
                                 <div key={qIdx} className="text-sm text-gray-700 italic bg-gray-50 p-3 rounded">
                                   <p>&ldquo;{quote.text}&rdquo;</p>
                                   <p className="text-xs text-gray-500 mt-1">Pagina {quote.page}</p>
