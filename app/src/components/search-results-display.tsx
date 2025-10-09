@@ -176,7 +176,7 @@ export default function SearchResultsDisplay({
                               <a 
                                 href={getPdfUrl(partyResult.party, quote.page)}
                                 target="_blank"
-                                rel="noopener noreferrer"
+                                rel="noopener noreferrer nofollow"
                                 className="text-blue-600 hover:text-blue-700 hover:underline"
                               >
                                 Pagina {quote.page}
