@@ -16,7 +16,7 @@ const barlowCondensed = Barlow_Condensed({
 export const metadata: Metadata = {
   title: {
     default: "Zweefhulp — Doorzoek verkiezingsprogramma's met AI",
-    template: "%s | Zweefhulp"
+    template: "%s — Zweefhulp"
   },
   description: "Een AI-aangedreven zoektool om verkiezingsprogramma's van de Tweede Kamerverkiezingen 2025 semantisch te doorzoeken en vergelijken. Vind relevante standpunten op basis van betekenis, niet alleen exacte zoektermen.",
   keywords: ["verkiezingen", "tweede kamer", "2025", "verkiezingsprogramma", "politiek", "stemmen", "vergelijken", "AI", "zoeken"],
