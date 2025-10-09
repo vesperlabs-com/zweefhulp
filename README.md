@@ -2,6 +2,8 @@
 
 Een AI-aangedreven zoektool om verkiezingsprogramma's van de Tweede Kamerverkiezingen 2025 semantisch te doorzoeken en vergelijken.
 
+*An AI-powered search tool to semantically search and compare Dutch election programs for the 2025 parliamentary elections.*
+
 ## Functies
 
 - **Semantisch zoeken** - Vind relevante standpunten op basis van betekenis, niet alleen exacte zoektermen
@@ -134,7 +136,7 @@ Een initiatief van:
 
 ## Contact
 
-[robert@gaal.co](mailto:robert@gaal.co)
+[info@zweefhulp.nl](mailto:info@zweefhulp.nl)
 
 ## Licentie
 

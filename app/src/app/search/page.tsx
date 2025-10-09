@@ -311,7 +311,7 @@ function SearchContent() {
               Broncode
             </a>
             <span>•</span>
-            <a href="mailto:robert@gaal.co" className="text-blue-600 hover:text-blue-700">
+            <a href="mailto:info@zweefhulp.nl" className="text-blue-600 hover:text-blue-700">
               Contact
             </a>
           </div>
