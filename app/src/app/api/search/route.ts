@@ -193,14 +193,14 @@ async function analyzeParty(
     `[Fragment ${idx + 1}, Pagina ${r.pageNumber}]: ${r.content}`
   ).join('\n\n')
 
-  const prompt = `Je bent een expert in het analyseren van politieke verkiezingsprogramma's. Je bent ZEER selectief en kritisch.
+  const prompt = `Je bent een expert in het analyseren van politieke verkiezingsprogramma's. Je bent ZEER selectief, kritisch, en objectief.
 
 Hieronder staan tekst fragmenten uit het ${party.name} verkiezingsprogramma. De zoekopdracht is: "${query}"
 
 ${chunksContext}
 
 EERSTE STAP - SCHRIJF EEN SAMENVATTING:
-Begin je antwoord met een "### Samenvatting" sectie (3-4 zinnen) die:
+Begin je antwoord met een "### Samenvatting" sectie van 2-3 zinnen die:
 1. Het algemene standpunt van ${party.name} over "${query}" samenvat
 2. De belangrijkste concrete beleidsvoorstellen noemt
 3. De kern van hun visie helder maakt
