@@ -39,6 +39,10 @@ export default function Home() {
               "asielzoekers",
               "zorgakkoord",
               "europa",
+              "tata steel",
+              "bestaanszekerheid",
+              "energierekening",
+              "groningen",
             ].map((term) => (
               <Link
                 href={`/search?q=${encodeURIComponent(term).replace(
