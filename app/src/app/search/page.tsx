@@ -2,8 +2,13 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import SearchPageClient from './client'
 
-export async function generateMetadata({ searchParams }: { searchParams: { q?: string } }): Promise<Metadata> {
-  const query = searchParams.q || ''
+export async function generateMetadata({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ q?: string }> 
+}): Promise<Metadata> {
+  const params = await searchParams
+  const query = params.q || ''
   
   if (!query) {
     return {
