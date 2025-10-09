@@ -143,7 +143,7 @@ export default function SearchResultsDisplay({
                     <h2 className="text-xl font-medium">{partyResult.party}</h2>
                   </a>
                 </div>
-                {partyResult.summary && (
+                {hasResults && partyResult.summary && (
                   <p className="text-sm text-gray-600">
                     {partyResult.summary}
                   </p>
