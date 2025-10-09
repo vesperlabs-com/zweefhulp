@@ -85,12 +85,15 @@ export default function SearchPageClient() {
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(q)}`)
       if (!response.ok) {
-        throw new Error('Fout bij het zoeken')
+        const errorData = await response.json()
+        // Store structured error data
+        setError(JSON.stringify(errorData))
+        return
       }
       const data = await response.json()
       setResults(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Er is iets misgegaan')
+      setError(JSON.stringify({ error: 'Er is iets misgegaan' }))
     } finally {
       clearInterval(interval)
       setLoading(false)
@@ -157,11 +160,25 @@ export default function SearchPageClient() {
           </div>
         )}
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-            {error}
-          </div>
-        )}
+        {error && (() => {
+          let errorData
+          try {
+            errorData = JSON.parse(error)
+          } catch {
+            errorData = { error: error }
+          }
+
+          return (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-700 font-medium mb-2">{errorData.error}</p>
+              {errorData.description && (
+                <p className="text-red-700 text-sm">
+                  {errorData.description}
+                </p>
+              )}
+            </div>
+          )
+        })()}
 
         {!loading && !error && results && (
           <SearchResultsDisplay

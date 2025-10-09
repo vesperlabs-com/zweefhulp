@@ -388,8 +388,23 @@ export async function GET(request: NextRequest) {
     const validation = await validateQuery(query)
     
     if (!validation.isValid) {
+      const funnyErrors = [
+        'Dit past niet in het regeerakkoord...',
+        'De Tweede Kamer is in reces voor deze vraag...',
+        'Zelfs de oppositie zou hier niet over debatteren...',
+        'Dit valt buiten de portefeuille van alle ministers...',
+        'De coalitie kan hier geen meerderheid voor vinden...',
+        'Zelfs de formateur zou dit afwijzen...',
+        'Hier heeft niemand een actieve herinnering aan...'
+      ]
+      
+      const randomError = funnyErrors[Math.floor(Math.random() * funnyErrors.length)]
+      
       return NextResponse.json(
-        { error: validation.reason || 'Deze zoekopdracht is niet geschikt.' },
+        { 
+          error: randomError,
+          description: 'Probeer een geldige zoekterm over politiek, beleid, of maatschappelijke onderwerpen.'
+        },
         { status: 400 }
       )
     }
