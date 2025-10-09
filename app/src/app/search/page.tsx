@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { getPartyLogo } from '@/lib/party-data'
 
 type Quote = {
   text: string
@@ -54,6 +55,7 @@ function SearchContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0])
+  const [sortMode, setSortMode] = useState<'relevance' | 'alphabetical'>('relevance')
 
   // Encode query with + for spaces (like Google)
   const encodeQuery = (q: string) => encodeURIComponent(q).replace(/%20/g, '+')
@@ -139,10 +141,38 @@ function SearchContent() {
       <main className="max-w-5xl mx-auto px-4 py-8">
         {/* Search Query Display */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">
-            <span className="block text-sm font-normal font-sans text-gray-600 mb-1">Verkiezingsprogramma's 2025 over</span>
-            {query}
-          </h1>
+          <div className="flex items-end justify-between mb-4">
+            <h1 className="text-3xl font-bold text-gray-800">
+              <span className="block text-sm font-normal font-sans text-gray-600 mb-1">Verkiezingsprogramma's 2025 over</span>
+              {query}
+            </h1>
+            
+            {/* Sort Toggle */}
+            {!loading && !error && results && (
+              <div className="flex bg-gray-100 rounded-lg p-1 gap-1">
+                <button
+                  onClick={() => setSortMode('relevance')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded transition-all ${
+                    sortMode === 'relevance'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Relevantie
+                </button>
+                <button
+                  onClick={() => setSortMode('alphabetical')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded transition-all ${
+                    sortMode === 'alphabetical'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  A-Z
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {loading && (
@@ -161,51 +191,48 @@ function SearchContent() {
 
         {!loading && !error && results && (
           <>
-            {/* Frequency Chart */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-              <h2 className="text-lg font-medium text-gray-800 mb-6">Aantal citaten per partij</h2>
-              
-              <div className="flex items-end justify-start gap-3 overflow-x-auto pb-2 pt-2" style={{ height: '360px' }}>
-                {(() => {
-                  const sortedParties = [...results.parties].sort((a, b) => b.count - a.count)
-                  const maxCount = Math.max(...results.parties.map(p => p.count), 1)
-                  
-                  return sortedParties.map((party) => {
-                    if (party.count === 0) return null
-                    
-                    const barHeight = (party.count / maxCount) * 300
-                    const barColor = party.count > 10 ? 'bg-blue-600' : party.count > 5 ? 'bg-blue-500' : 'bg-blue-400'
-                    const partyId = party.short.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '')
+            {/* Party Navigator */}
+            <div className="sticky top-[70px] z-10 -mx-4 px-4 py-3 bg-gray-50/95 backdrop-blur-sm border-y border-gray-200 mb-6">
+              <div className="flex justify-evenly overflow-x-auto scrollbar-hide py-2">
+                {results.parties
+                  .filter(p => p.standpunten.length > 0)
+                  .sort((a, b) => {
+                    if (sortMode === 'alphabetical') {
+                      return a.party.localeCompare(b.party)
+                    }
+                    return b.count - a.count // relevance by count
+                  })
+                  .map((partyResult) => {
+                    const partyId = partyResult.short.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '')
                     
                     return (
-                      <a 
-                        key={party.short}
+                      <a
+                        key={partyResult.party}
                         href={`#${partyId}`}
-                        className="flex flex-col items-center group flex-shrink-0" 
-                        style={{ width: '60px', height: '100%' }}
+                        className="flex-shrink-0 transition-all hover:scale-110"
+                        title={partyResult.party}
                       >
-                        <div className="flex-grow flex flex-col justify-end w-full">
-                          <div 
-                            className={`${barColor} w-full rounded-t transition-all duration-500 flex flex-col items-center justify-start pt-2`}
-                            style={{ height: `${barHeight}px` }}
-                          >
-                            <span className="text-xs font-medium text-white">{party.count}</span>
-                          </div>
-                        </div>
-                        <span className="text-xs text-gray-700 group-hover:text-blue-600 transition-colors mt-2 text-center break-words w-full">
-                          {party.short}
-                        </span>
+                        <img 
+                          src={getPartyLogo(partyResult.party)} 
+                          alt={partyResult.party}
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
                       </a>
                     )
-                  })
-                })()}
+                  })}
               </div>
             </div>
 
             {/* Party Results */}
             <div className="space-y-6">
               {results.parties
-                .sort((a, b) => b.count - a.count)
+                .filter(p => p.standpunten.length > 0)
+                .sort((a, b) => {
+                  if (sortMode === 'alphabetical') {
+                    return a.party.localeCompare(b.party)
+                  }
+                  return b.count - a.count // relevance by count
+                })
                 .map((partyResult) => {
                   const partyId = partyResult.short.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '')
                   
@@ -213,48 +240,51 @@ function SearchContent() {
                     <div 
                       key={partyResult.party} 
                       id={partyId}
-                      className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-24"
+                      className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 scroll-mt-[160px]"
                     >
-                      <div className="flex items-start justify-between mb-4">
-                          <div>
+                      <div className="mb-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <img 
+                              src={getPartyLogo(partyResult.party)} 
+                              alt={partyResult.party}
+                              className="h-10 w-auto"
+                            />
                             <h3 className="text-xl font-medium text-gray-800">{partyResult.party}</h3>
-                            <p className="text-sm text-gray-500 mt-1">
-                              {partyResult.count} citaa{partyResult.count !== 1 ? 'ten' : 't'}
-                            </p>
                           </div>
-                        <a
-                          href={partyResult.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 transition-colors"
-                        >
-                          Lees meer
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                          </svg>
-                        </a>
+                          <a
+                            href={partyResult.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 transition-colors"
+                          >
+                            Lees meer
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </a>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          {/* TODO */} Samenvatting van de standpunten komt hier
+                        </p>
                       </div>
                       
-                      {partyResult.count > 0 ? (
-                        <div className="space-y-5">
-                          {partyResult.standpunten.map((standpunt, idx) => (
-                            <div key={idx} className="border-l-2 border-blue-500 pl-4">
-                              <h4 className="font-medium text-gray-800 mb-1">{standpunt.title}</h4>
-                              <p className="text-sm text-gray-600 mb-3">{standpunt.subtitle}</p>
-                              <div className="space-y-2">
-                                {standpunt.quotes.map((quote, qIdx) => (
-                                  <div key={qIdx} className="text-sm text-gray-700 italic bg-gray-50 p-3 rounded">
-                                    <p>&ldquo;{quote.text}&rdquo;</p>
-                                    <p className="text-xs text-gray-500 mt-1">Pagina {quote.page}</p>
-                                  </div>
-                                ))}
-                              </div>
+                      <div className="space-y-5">
+                        {partyResult.standpunten.map((standpunt, idx) => (
+                          <div key={idx} className="border-l-2 border-blue-500 pl-4">
+                            <h4 className="font-medium text-gray-800 mb-1">{standpunt.title}</h4>
+                            <p className="text-sm text-gray-600 mb-3">{standpunt.subtitle}</p>
+                            <div className="space-y-2">
+                              {standpunt.quotes.map((quote, qIdx) => (
+                                <div key={qIdx} className="text-sm text-gray-700 italic bg-gray-50 p-3 rounded">
+                                  <p>&ldquo;{quote.text}&rdquo;</p>
+                                  <p className="text-xs text-gray-500 mt-1">Pagina {quote.page}</p>
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-gray-600 text-sm">Geen citaten gevonden</p>
-                      )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )
                 })}
