@@ -31,14 +31,12 @@ type SearchResultsDisplayProps = {
   results: SearchResults
   query: string
   sortMode: 'relevance' | 'alphabetical'
-  onSortModeChange: (mode: 'relevance' | 'alphabetical') => void
 }
 
 export default function SearchResultsDisplay({
   results,
   query,
-  sortMode,
-  onSortModeChange
+  sortMode
 }: SearchResultsDisplayProps) {
   const { toggleFavorite, isFavorite } = useFavorites()
   
@@ -106,32 +104,6 @@ export default function SearchResultsDisplay({
               </a>
             )
           })}
-        </div>
-      </div>
-
-      {/* Sort Toggle */}
-      <div className="flex justify-end mb-4">
-        <div className="flex bg-gray-100 rounded-lg p-1 gap-1 whitespace-nowrap">
-          <button
-            onClick={() => onSortModeChange('relevance')}
-            className={`px-3 py-1.5 text-sm font-medium rounded transition-all cursor-pointer ${
-              sortMode === 'relevance'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Relevantie
-          </button>
-          <button
-            onClick={() => onSortModeChange('alphabetical')}
-            className={`px-3 py-1.5 text-sm font-medium rounded transition-all cursor-pointer ${
-              sortMode === 'alphabetical'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            A-Z
-          </button>
         </div>
       </div>
 

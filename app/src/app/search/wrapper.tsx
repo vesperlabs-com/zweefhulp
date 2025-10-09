@@ -86,19 +86,44 @@ export default function SearchPageWrapper({ results, query }: SearchPageWrapperP
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 py-8">
-        {/* Search Query Display */}
-        <div className="mb-8">
+        {/* Search Query Display and Sort Toggle */}
+        <div className="mb-8 flex items-end justify-between gap-4">
           <h1 className="text-3xl font-bold text-gray-800">
             <span className="block text-sm font-normal font-sans text-gray-600 mb-1">Verkiezingsprogramma's 2025 over</span>
             {query}
           </h1>
+          
+          {/* Sort Toggle */}
+          <div className="flex bg-gray-100 rounded-lg p-1 gap-1 whitespace-nowrap">
+            <button
+              type="button"
+              onClick={() => setSortMode('relevance')}
+              className={`px-3 py-1.5 text-sm font-medium rounded transition-all cursor-pointer ${
+                sortMode === 'relevance'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Relevantie
+            </button>
+            <button
+              type="button"
+              onClick={() => setSortMode('alphabetical')}
+              className={`px-3 py-1.5 text-sm font-medium rounded transition-all cursor-pointer ${
+                sortMode === 'alphabetical'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              A-Z
+            </button>
+          </div>
         </div>
 
         <SearchResultsDisplay
           results={results}
           query={query}
           sortMode={sortMode}
-          onSortModeChange={setSortMode}
         />
       </main>
 
