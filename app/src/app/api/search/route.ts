@@ -3,6 +3,79 @@ import { openai } from '@ai-sdk/openai'
 import { embed, generateText } from 'ai'
 import { prisma } from '@/lib/prisma-edge'
 
+/**
+ * Parse markdown format to standpunten structure
+ * Expected format:
+ * ## Heading
+ * Explanation paragraph
+ * - "quote" (pagina X)
+ * - "quote" (pagina Y)
+ */
+function parseMarkdownToStandpunten(markdown: string): { standpunten: Array<{
+  title: string
+  subtitle: string
+  quotes: Array<{ text: string; page: number }>
+}> } {
+  const standpunten: Array<{
+    title: string
+    subtitle: string
+    quotes: Array<{ text: string; page: number }>
+  }> = []
+
+  // Split by ## headings (level 2)
+  const sections = markdown.split(/^##\s+/m).filter(s => s.trim().length > 0)
+
+  for (const section of sections) {
+    const lines = section.trim().split('\n')
+    if (lines.length === 0) continue
+
+    // First line is the title
+    const title = lines[0].trim()
+    
+    // Find where quotes start (lines starting with -)
+    const firstQuoteIndex = lines.findIndex(line => line.trim().startsWith('-'))
+    
+    if (firstQuoteIndex === -1) {
+      // No quotes found, skip this section
+      continue
+    }
+
+    // Everything between title and first quote is the subtitle
+    const subtitleLines = lines.slice(1, firstQuoteIndex)
+      .map(l => l.trim())
+      .filter(l => l.length > 0)
+    const subtitle = subtitleLines.join(' ')
+
+    // Parse quotes (lines starting with -)
+    const quotes: Array<{ text: string; page: number }> = []
+    
+    for (let i = firstQuoteIndex; i < lines.length; i++) {
+      const line = lines[i].trim()
+      if (!line.startsWith('-')) continue
+
+      // Match: - "quote text" (pagina X)
+      const quoteMatch = line.match(/^-\s*"([^"]+)"\s*\(pagina\s+(\d+)\)/)
+      if (quoteMatch) {
+        quotes.push({
+          text: quoteMatch[1].trim(),
+          page: parseInt(quoteMatch[2], 10)
+        })
+      }
+    }
+
+    // Only add standpunt if it has quotes
+    if (quotes.length > 0 && title && subtitle) {
+      standpunten.push({
+        title,
+        subtitle,
+        quotes
+      })
+    }
+  }
+
+  return { standpunten }
+}
+
 async function analyzeParty(
   query: string,
   partyId: string,
@@ -69,7 +142,7 @@ async function analyzeParty(
   // Not cached, generate new results
   const program = party.programs[0]
 
-  // Perform vector similarity search (top 50 chunks)
+  // Perform vector similarity search (top 30 chunks)
   // Uses ivfflat index for fast approximate nearest neighbor search
   const results = await prisma.$queryRaw<Array<{
     id: string
@@ -85,7 +158,7 @@ async function analyzeParty(
     FROM "Document"
     WHERE "programId" = ${program.id}
     ORDER BY vector <=> ${vectorString}::vector
-    LIMIT 25
+    LIMIT 30
   `
 
   // If no results found
@@ -101,7 +174,7 @@ async function analyzeParty(
 
   // Prepare context for LLM
   const chunksContext = results.map((r, idx) => 
-    `[${idx + 1}] (Pagina ${r.pageNumber}): ${r.content}`
+    `[Fragment ${idx + 1}, Pagina ${r.pageNumber}]: ${r.content}`
   ).join('\n\n')
 
   const prompt = `Je bent een expert in het analyseren van politieke verkiezingsprogramma's. Je bent ZEER selectief en kritisch.
@@ -112,98 +185,77 @@ ${chunksContext}
 
 KRITISCHE ANALYSE VEREIST:
 1. Beoordeel elk fragment op echte relevantie voor "${query}". Vage of algemene uitspraken NIET includeren.
-2. Identificeer alleen DUIDELIJK VERSCHILLENDE standpunten/posities. Als quotes hetzelfde zeggen, groepeer ze onder 1 standpunt.
-3. Minder is meer! Lever ALLEEN standpunten die echt waardevol zijn.
-4. Selecteer alleen de MEEST CONCRETE en INFORMATIEVE quotes (verbatim).
+2. Identificeer DUIDELIJK VERSCHILLENDE standpunten/posities over "${query}"
+3. Als quotes hetzelfde zeggen of hetzelfde aspect behandelen: groepeer ze onder 1 standpunt
+4. Minder is meer! Lever ALLEEN standpunten die echt waardevol en onderscheidend zijn
+5. Selecteer alleen de MEEST CONCRETE en INFORMATIEVE quotes (verbatim, max 1-2 zinnen per quote)
 
 KWALITEIT BOVEN KWANTITEIT:
 - Als er maar 1-2 echte standpunten zijn: geef alleen die
 - Als fragmenten te vaag zijn: negeer ze
-- Als quotes elkaar herhalen: kies de beste
-- Als er NIETS echt relevants is: return lege array
+- Als quotes elkaar herhalen: kies de beste en groepeer onder 1 standpunt
+- Als er NIETS echt relevants is: geef geen standpunten
 
-STRUCTUUR VAN ELK STANDPUNT:
+STANDPUNTEN GROEPEREN:
+Groepeer quotes logisch onder verschillende standpunten als ze over verschillende aspecten gaan:
+- Verschillende voorstellen/beleidsmaatregelen
+- Verschillende problemen die worden geadresseerd
+- Verschillende invalshoeken of perspectieven
+- Korte termijn vs lange termijn maatregelen
+- Verschillende doelgroepen
 
-1. **Title (Titel)**: De concrete positie/het standpunt van de partij
-   - Formuleer als een duidelijke positie of voorstel
-   - Voorbeeld: "Meer sociale woningen bouwen" of "Verlaging van CO2-uitstoot verplichten"
-   - Max 8 woorden
+ELK STANDPUNT HEEFT:
+1. **Heading (##)**: De concrete positie/het voorstel (max 8 woorden)
+   - Formuleer als duidelijke positie: "Meer sociale woningen bouwen" niet "Beleid voor woningen"
    - Vermijd vage termen als "aanpak" of "beleid"
 
-2. **Subtitle (Ondertitel)**: De context of redenering
+2. **Uitleg (2-3 zinnen)**: Context en redenering
    - WAAROM neemt de partij dit standpunt in?
    - WELK probleem adresseert het?
-   - HOE relateert het aan "${query}"?
-   - Voorbeeld bij "Meer sociale woningen bouwen": "Om wachtlijsten te verkorten en betaalbaar wonen te garanderen"
-   - Max 15 woorden
-   - Voeg waarde toe, herhaal niet de titel
+   - HOE relateert het specifiek aan "${query}"?
+   - Voeg waarde toe, herhaal niet alleen de heading
 
-3. **Quotes**: VERBATIM bewijs uit het programma
-   - Exacte citaten die dit standpunt ondersteunen
-   - Concreet en informatief
-   - Niet parafraseren!
+3. **Quotes (bulletlijst)**: VERBATIM bewijs
+   - Elk citaat exact uit het programma (max 1-2 zinnen)
+   - Formaat: - "exacte tekst" (pagina X)
+   - GEEN parafrase of interpretatie!
+   - Alleen quotes die dit specifieke standpunt ondersteunen
 
-VOORBEELD:
-Slecht:
-{
-  "title": "Beleid voor woningmarkt",
-  "subtitle": "De partij heeft plannen voor woningen"
-}
+VERPLICHTE markdown structuur:
+## [Standpunt 1 titel]
 
-Goed:
-{
-  "title": "100.000 sociale huurwoningen per jaar bijbouwen",
-  "subtitle": "Om starter en middeninkomens toegang tot betaalbaar wonen te geven"
-}
+[Korte uitleg over dit standpunt in 2-3 zinnen, met context en redenering]
 
-JSON formaat:
-{
-  "standpunten": [
-    {
-      "title": "...",
-      "subtitle": "...",
-      "quotes": [
-        {
-          "text": "exacte quote",
-          "page": 42,
-          "fragmentNumber": 5
-        }
-      ]
-    }
-  ]
-}
+- "Exact citaat dat dit standpunt ondersteunt" (pagina X)
+- "Ander exact citaat over dit specifieke aspect" (pagina Y)
 
-STRIKTE REGELS:
-- Quotes moeten EXACT matchen met brontekst
-- Geen parafraseren of samenvatten
-- GEEN DUPLICATE QUOTES - elke quote mag maar 1x voorkomen, ook niet over verschillende standpunten heen
-- Titel = het standpunt, Subtitle = de context/redenering
+## [Standpunt 2 titel - alleen als DUIDELIJK ANDERS]
+
+[Korte uitleg over dit andere standpunt]
+
+- "Exact citaat" (pagina Z)
+
+BELANGRIJK:
+- Quotes moeten LETTERLIJK uit de fragmenten komen
+- Geen duplicate quotes over standpunten heen
 - Alleen substantiële, concrete standpunten
 - Bij twijfel: weglaten
-- ZOEKOPDRACHT MOET IN QUOTE VOORKOMEN: De zoekopdracht "${query}" (of een duidelijk synoniem/variatie) moet letterlijk in de quote voorkomen
-  * Geldig: "startup" kan zijn "start-ups", "start ups", "start- en scale-ups"
-  * NIET geldig: gerelateerde maar ANDERE concepten zoals "startup" → "ZZP", "zzp'er", "ondernemer"
-  * Als de zoekopdracht niet voorkomt in de quote: NIET selecteren
-- Antwoord ALLEEN met JSON, geen extra tekst`
+
+Antwoord ALLEEN met markdown, geen extra tekst.`
 
   // Generate analysis with LLM
   const { text } = await generateText({
-    model: openai('gpt-5-nano'),
+    model: openai('gpt-4.1'),
     prompt,
     temperature: 0.2,
   })
 
-  // Parse the LLM response
+  // Parse the markdown response
   let parsedResponse
   try {
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
-    if (jsonMatch) {
-      parsedResponse = JSON.parse(jsonMatch[0])
-    } else {
-      parsedResponse = JSON.parse(text)
-    }
+    parsedResponse = parseMarkdownToStandpunten(text)
   } catch (e) {
-    console.error(`Failed to parse LLM response for ${party.name}:`, text)
+    console.error(`Failed to parse markdown response for ${party.name}:`, e)
     return {
       party: party.name,
       short: party.shortName || party.name,
