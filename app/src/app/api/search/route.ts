@@ -251,7 +251,7 @@ ELK STANDPUNT HEEFT:
 VERPLICHTE markdown structuur:
 ### Samenvatting
 
-[3-4 zinnen die het algemene standpunt en belangrijkste voorstellen samenvatten]
+[2-3 zinnen die het algemene standpunt en belangrijkste voorstellen samenvatten]
 
 ## [Standpunt 1 titel]
 
