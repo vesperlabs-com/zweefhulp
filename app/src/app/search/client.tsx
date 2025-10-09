@@ -269,11 +269,9 @@ export default function SearchPageClient() {
                           </p>
                         )}
                         {!hasResults && (
-                          <div className="mt-3 p-3 bg-gray-50 rounded-md border border-gray-200">
-                            <p className="text-sm text-gray-600 italic">
-                              Deze partij noemt dit onderwerp niet expliciet in hun verkiezingsprogramma.
-                            </p>
-                          </div>
+                          <p className="text-sm text-gray-600 italic">
+                            Niet expliciet genoemd in verkiezingsprogramma
+                          </p>
                         )}
                       </div>
                       
