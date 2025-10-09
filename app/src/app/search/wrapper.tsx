@@ -103,25 +103,38 @@ export default function SearchPageWrapper({ results, query }: SearchPageWrapperP
 
       {/* Footer */}
       <footer className="w-full py-4 border-t border-gray-100 mt-8">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-gray-500">
-          <p>
-            Een initiatief van{' '}
-            <a href="https://gaal.co" className="text-blue-600 hover:text-blue-700" target="_blank" rel="noopener noreferrer">
-              Robert Gaal
-            </a>
-            {' '}en{' '}
-            <a href="https://stefanborsje.com/" className="text-blue-600 hover:text-blue-700" target="_blank" rel="noopener noreferrer">
-              Stefan Borsje
-            </a>
-          </p>
-          <div className="flex gap-3">
-            <a href="https://github.com/vesperlabs-com/zweefhulp" className="text-blue-600 hover:text-blue-700" target="_blank" rel="noopener noreferrer">
-              Broncode
-            </a>
-            <span>•</span>
-            <a href="mailto:info@zweefhulp.nl" className="text-blue-600 hover:text-blue-700">
-              Contact
-            </a>
+        <div className="max-w-7xl mx-auto px-4 text-xs text-gray-500">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
+            <p>
+              Een initiatief van{" "}
+              <a
+                href="https://vesperlabs.com"
+                className="text-blue-600 hover:text-blue-700"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Vesper Labs
+              </a>
+            </p>
+            <div className="flex gap-3">
+              <span>Let op: Verifieer altijd AI-resultaten</span>
+              <span>•</span>
+              <a
+                href="https://github.com/vesperlabs-com/zweefhulp"
+                className="text-blue-600 hover:text-blue-700"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Broncode
+              </a>
+              <span>•</span>
+              <a
+                href="mailto:info@zweefhulp.nl"
+                className="text-blue-600 hover:text-blue-700"
+              >
+                Contact
+              </a>
+            </div>
           </div>
         </div>
       </footer>

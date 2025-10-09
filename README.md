@@ -130,7 +130,8 @@ pnpm format   # Format code met Biome
 
 ## Credits
 
-Een initiatief van:
+Een initiatief van [Vesper Labs](https://vesperlabs.com):
+
 - [Robert Gaal](https://gaal.co)
 - [Stefan Borsje](https://stefanborsje.com/)
 
