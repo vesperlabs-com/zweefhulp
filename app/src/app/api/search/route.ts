@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { openai } from '@ai-sdk/openai'
 import { embed, generateText } from 'ai'
 import { prisma } from '@/lib/prisma-edge'
+import { cleanQuery, validateQuery } from '@/lib/search-guardrails'
+import { getCachedSearchResults } from '@/lib/search-cache'
 
 /**
  * Parse markdown format to positions structure
@@ -361,12 +363,38 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
-    const query = searchParams.get('q')
+    const rawQuery = searchParams.get('q')
 
-    if (!query) {
+    if (!rawQuery) {
       return NextResponse.json({ error: 'Query parameter is required' }, { status: 400 })
     }
 
+    // Clean the query (trim + enforce 500 char limit)
+    const query = cleanQuery(rawQuery)
+
+    if (query.length === 0) {
+      return NextResponse.json({ error: 'Query cannot be empty' }, { status: 400 })
+    }
+
+    // Check if we have cached results for all parties
+    const cachedResults = await getCachedSearchResults(query)
+    
+    if (cachedResults) {
+      // All parties are cached, return immediately without validation
+      return NextResponse.json(cachedResults)
+    }
+
+    // Not fully cached, validate the query before running expensive LLM operations
+    const validation = await validateQuery(query)
+    
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { error: validation.reason || 'Deze zoekopdracht is niet geschikt.' },
+        { status: 400 }
+      )
+    }
+
+    // Query is valid, proceed with normal flow
     // Fetch all parties from database
     const parties = await prisma.party.findMany()
 
