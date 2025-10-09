@@ -35,7 +35,7 @@ Het project gebruikt PostgreSQL met de pgvector extensie voor vector embeddings.
 
 ### Verkiezingsprogramma's
 
-Alle verkiezingsprogramma's zijn gedownload op **6 oktober 2025** van de officiële websites van de politieke partijen. Ze zijn niet aangepast en opgeslagen in de [`app/programs/`](app/programs/) directory.
+Alle verkiezingsprogramma's zijn gedownload op **6 oktober 2025** van de officiële websites van de politieke partijen. Ze zijn niet aangepast en opgeslagen in de [`app/public/programs/`](app/public/programs/) directory.
 
 ### Seeding
 
