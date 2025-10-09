@@ -7,7 +7,7 @@ Een AI-aangedreven zoektool om verkiezingsprogramma's van de Tweede Kamerverkiez
 ## Functies
 
 - **Semantisch zoeken** - Vind relevante standpunten op basis van betekenis, niet alleen exacte zoektermen
-- **Visuele vergelijking** - Zie in één oogopslag welke partijen het meeste schrijven over jouw onderwerp
+- **Visuele vergelijking** - Zie in één oogopslag wat de verschillende standpunten zijn over jouw onderwerp
 - **Directe citaten** - Lees de exacte tekst uit de verkiezingsprogramma's met paginanummers
 
 ## Technologie
@@ -17,17 +17,17 @@ Een AI-aangedreven zoektool om verkiezingsprogramma's van de Tweede Kamerverkiez
 - **Prisma ORM** voor database beheer
 - **OpenAI GPT** voor standpunt analyse via LLM
 - **OpenAI embeddings** voor semantisch zoeken
-- **Tailwind CSS** voor moderne styling
+- **Tailwind CSS** voor stijl en design
 - **pnpm** als package manager
 
 ## Data
 
 ### Database
 
-Het project gebruikt PostgreSQL met de pgvector extensie voor vector embeddings. De database schema bevat:
+We gebruiken PostgreSQL met de pgvector extensie voor vector embeddings. De database schema bevat:
 
 - **Party** - Politieke partijen met metadata
-- **Program** - Verkiezingsprogramma's (PDFs)
+- **Program** - Verkiezingsprogramma's in PDFs
 - **Document** - Geparseerde pagina's met vector embeddings
 - **SearchResult** - Gecachte zoekresultaten
 - **Position** - Standpunten per partij
@@ -53,7 +53,7 @@ Het seeding proces ([`app/prisma/seed.ts`](app/prisma/seed.ts)) verwerkt alle PD
 
 ## AI
 
-Zweefhulp gebruikt AI op drie manieren om verkiezingsprogramma's doorzoekbaar te maken:
+_Zweefhulp_ gebruikt AI op drie manieren om verkiezingsprogramma's doorzoekbaar te maken:
 
 ### 1. Document Embeddings (Seeding)
 
