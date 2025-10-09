@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, FormEvent } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import SearchResultsDisplay from '@/components/search-results-display'
 
@@ -29,71 +29,18 @@ type SearchResults = {
   parties: PartyResult[]
 }
 
-const LOADING_MESSAGES = [
-  'Koffie halen voor de Tweede Kamer...',
-  'Politieke streepjes aan het tellen...',
-  'Coalitieonderhandelingen aan het speedrunnen...',
-  'Verkiezingsbeloftes aan het feit-checken...',
-  'Standpunten aan het vergelijken...',
-  'Debatleden aan het briefen over jouw vraag...',
-  'Compromissen aan het pre-kauwen voor je...',
-  'De Kieswet aan het nalezen...',
-  'Programmapunten zoeken met een vergrootglas...',
-  'Stemhokjes aan het opbouwen...',
-  'Fractieleden aan het wakker maken...',
-  'Overleggen met het pluche...',
-  'Achterkamertjes even raadplegen...',
-  'Applaus voor de democratie optrommelen...',
-]
+type SearchPageWrapperProps = {
+  results: SearchResults
+  query: string
+}
 
-export default function SearchPageClient() {
+export default function SearchPageWrapper({ results, query }: SearchPageWrapperProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const query = searchParams.get('q') || ''
-  
   const [searchQuery, setSearchQuery] = useState(query)
-  const [results, setResults] = useState<SearchResults | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0])
   const [sortMode, setSortMode] = useState<'relevance' | 'alphabetical'>('relevance')
 
   // Encode query with + for spaces (like Google)
   const encodeQuery = (q: string) => encodeURIComponent(q).replace(/%20/g, '+')
-
-  useEffect(() => {
-    if (query) {
-      fetchResults(query)
-    }
-  }, [query])
-
-  const fetchResults = async (q: string) => {
-    setLoading(true)
-    setError(null)
-    
-    // Rotate loading messages every 3 seconds
-    const randomMessage = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
-    setLoadingMessage(randomMessage)
-    
-    const interval = setInterval(() => {
-      const newMessage = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
-      setLoadingMessage(newMessage)
-    }, 3000)
-    
-    try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(q)}`)
-      if (!response.ok) {
-        throw new Error('Fout bij het zoeken')
-      }
-      const data = await response.json()
-      setResults(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Er is iets misgegaan')
-    } finally {
-      clearInterval(interval)
-      setLoading(false)
-    }
-  }
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
@@ -146,28 +93,12 @@ export default function SearchPageClient() {
           </h1>
         </div>
 
-        {loading && (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">{loadingMessage}</p>
-            <p className="mt-2 text-sm text-gray-500">Dit kan tot een minuut duren</p>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-            {error}
-          </div>
-        )}
-
-        {!loading && !error && results && (
-          <SearchResultsDisplay
-            results={results}
-            query={query}
-            sortMode={sortMode}
-            onSortModeChange={setSortMode}
-          />
-        )}
+        <SearchResultsDisplay
+          results={results}
+          query={query}
+          sortMode={sortMode}
+          onSortModeChange={setSortMode}
+        />
       </main>
 
       {/* Footer */}
@@ -197,4 +128,5 @@ export default function SearchPageClient() {
     </div>
   )
 }
+
 

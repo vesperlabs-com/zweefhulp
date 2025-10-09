@@ -1,6 +1,8 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import SearchPageClient from './client'
+import SearchPageSSR from './server'
+import { getCachedSearchResults } from '@/lib/search-cache'
 
 export async function generateMetadata({ 
   searchParams 
@@ -37,7 +39,32 @@ export async function generateMetadata({
   }
 }
 
-export default function SearchPage() {
+export default async function SearchPage({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ q?: string }> 
+}) {
+  const params = await searchParams
+  const query = params.q || ''
+
+  // If no query, render client component
+  if (!query) {
+    return (
+      <Suspense fallback={<div>Laden...</div>}>
+        <SearchPageClient />
+      </Suspense>
+    )
+  }
+
+  // Check if results are fully cached
+  const cachedResults = await getCachedSearchResults(query)
+
+  // If fully cached, render server-side
+  if (cachedResults) {
+    return <SearchPageSSR results={cachedResults} query={query} />
+  }
+
+  // Otherwise, render client-side with loading
   return (
     <Suspense fallback={<div>Laden...</div>}>
       <SearchPageClient />
