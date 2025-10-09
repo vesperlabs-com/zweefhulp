@@ -148,7 +148,7 @@ export default function SearchPageClient() {
             
             {/* Sort Toggle */}
             {!loading && !error && results && (
-              <div className="flex bg-gray-100 rounded-lg p-1 gap-1">
+              <div className="flex bg-gray-100 rounded-lg p-1 gap-1 whitespace-nowrap">
                 <button
                   onClick={() => setSortMode('relevance')}
                   className={`px-3 py-1.5 text-sm font-medium rounded transition-all ${
@@ -192,7 +192,7 @@ export default function SearchPageClient() {
           <>
             {/* Party Navigator */}
             <div className="sticky top-[70px] z-10 -mx-4 px-4 py-3 bg-gray-50/95 backdrop-blur-sm border-y border-gray-200 mb-6">
-              <div className="flex justify-evenly overflow-x-auto scrollbar-hide py-2">
+              <div className="flex justify-evenly overflow-x-auto scrollbar-hide py-2 gap-x-1">
                 {results.parties
                   .sort((a, b) => {
                     if (sortMode === 'alphabetical') {
