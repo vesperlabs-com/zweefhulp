@@ -1,4 +1,5 @@
 import { prisma } from './prisma-edge'
+import { slugify } from './slugify'
 
 type Quote = {
   text: string
@@ -22,6 +23,7 @@ type PartyResult = {
 
 type SearchResults = {
   parties: PartyResult[]
+  query: string
 }
 
 /**
@@ -98,6 +100,27 @@ export async function getCachedSearchResults(
     }
   })
 
-  return { parties }
+  return { parties, query }
+}
+
+/**
+ * Get cached search results by slug
+ * Returns the original query and results if fully cached
+ */
+export async function getCachedSearchResultsBySlug(
+  slug: string
+): Promise<SearchResults | null> {
+  // First, find any search result with this slug to get the original query
+  const firstResult = await prisma.searchResult.findFirst({
+    where: { slug },
+    select: { query: true }
+  })
+
+  if (!firstResult) {
+    return null
+  }
+
+  // Now get all results using the original query
+  return getCachedSearchResults(firstResult.query)
 }
 

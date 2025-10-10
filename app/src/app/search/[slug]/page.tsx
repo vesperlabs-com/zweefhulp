@@ -1,23 +1,28 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 import SearchPageClient from './client'
 import SearchPageSSR from './server'
-import { getCachedSearchResults } from '@/lib/search-cache'
+import { getCachedSearchResultsBySlug } from '@/lib/search-cache'
+import { deslugify } from '@/lib/slugify'
 
 export async function generateMetadata({ 
-  searchParams 
+  params 
 }: { 
-  searchParams: Promise<{ q?: string }> 
+  params: Promise<{ slug: string }> 
 }): Promise<Metadata> {
-  const params = await searchParams
-  const query = params.q || ''
+  const { slug } = await params
   
-  if (!query) {
+  if (!slug) {
     return {
       title: 'Zoeken',
       description: 'Doorzoek verkiezingsprogramma\'s van de Tweede Kamerverkiezingen 2025'
     }
   }
+
+  // Try to get cached results to find the original query
+  const cachedResults = await getCachedSearchResultsBySlug(slug)
+  const query = cachedResults?.query || deslugify(slug)
 
   const capitalizedQuery = query.charAt(0).toUpperCase() + query.slice(1)
   const title = `${capitalizedQuery} in verkiezingsprogramma's 2025`
@@ -29,7 +34,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      url: `https://zweefhulp.nl/search?q=${encodeURIComponent(query).replace(/%20/g, '+')}`,
+      url: `https://zweefhulp.nl/zoeken/${slug}`,
       images: ["/banner.png"]
     },
     twitter: {
@@ -41,31 +46,26 @@ export async function generateMetadata({
 }
 
 export default async function SearchPage({ 
-  searchParams 
+  params 
 }: { 
-  searchParams: Promise<{ q?: string }> 
+  params: Promise<{ slug: string }> 
 }) {
-  const params = await searchParams
-  const query = params.q || ''
+  const { slug } = await params
 
-  // If no query, render client component
-  if (!query) {
-    return (
-      <Suspense fallback={<div>Laden...</div>}>
-        <SearchPageClient />
-      </Suspense>
-    )
+  // If no slug, redirect to homepage
+  if (!slug) {
+    redirect('/')
   }
 
   // Check if results are fully cached
-  const cachedResults = await getCachedSearchResults(query)
+  const cachedResults = await getCachedSearchResultsBySlug(slug)
 
-  // If fully cached, render server-side
+  // If fully cached, render server-side with original query
   if (cachedResults) {
-    return <SearchPageSSR results={cachedResults} query={query} />
+    return <SearchPageSSR results={cachedResults} query={cachedResults.query} />
   }
 
-  // Otherwise, render client-side with loading
+  // Otherwise, render client-side with loading (will use deslugified query as fallback)
   return (
     <Suspense fallback={<div>Laden...</div>}>
       <SearchPageClient />

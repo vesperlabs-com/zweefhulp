@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, FormEvent } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import SearchResultsDisplay from '@/components/search-results-display'
+import { slugify, deslugify } from '@/lib/slugify'
 
 type Quote = {
   text: string
@@ -50,8 +51,9 @@ const LOADING_MESSAGES = [
 
 export default function SearchPageClient() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const query = searchParams.get('q') || ''
+  const params = useParams()
+  const slug = (params?.slug as string) || ''
+  const query = deslugify(slug)
   
   const [searchQuery, setSearchQuery] = useState(query)
   const [results, setResults] = useState<SearchResults | null>(null)
@@ -60,14 +62,11 @@ export default function SearchPageClient() {
   const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0])
   const [sortMode, setSortMode] = useState<'relevance' | 'alphabetical'>('relevance')
 
-  // Encode query with + for spaces (like Google)
-  const encodeQuery = (q: string) => encodeURIComponent(q).replace(/%20/g, '+')
-
   useEffect(() => {
-    if (query) {
+    if (slug) {
       fetchResults(query)
     }
-  }, [query])
+  }, [slug, query])
 
   const fetchResults = async (q: string) => {
     setLoading(true)
@@ -103,7 +102,7 @@ export default function SearchPageClient() {
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeQuery(searchQuery.trim())}`)
+      router.push(`/zoeken/${slugify(searchQuery.trim())}`)
     }
   }
 

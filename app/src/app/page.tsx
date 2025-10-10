@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SearchForm } from "@/components/search-form";
+import { slugify } from "@/lib/slugify";
 
 export default function Home() {
   return (
@@ -45,10 +46,7 @@ export default function Home() {
               "groningen",
             ].map((term) => (
               <Link
-                href={`/search?q=${encodeURIComponent(term).replace(
-                  /%20/g,
-                  "+"
-                )}`}
+                href={`/zoeken/${slugify(term)}`}
                 key={term}
                 className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-full text-sm border border-gray-200 transition-colors"
               >

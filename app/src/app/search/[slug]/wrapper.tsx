@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import SearchResultsDisplay from '@/components/search-results-display'
+import { slugify } from '@/lib/slugify'
 
 type Quote = {
   text: string
@@ -40,13 +41,10 @@ export default function SearchPageWrapper({ results, query, initialFavorites }: 
   const [searchQuery, setSearchQuery] = useState(query)
   const [sortMode, setSortMode] = useState<'relevance' | 'alphabetical'>('relevance')
 
-  // Encode query with + for spaces (like Google)
-  const encodeQuery = (q: string) => encodeURIComponent(q).replace(/%20/g, '+')
-
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeQuery(searchQuery.trim())}`)
+      router.push(`/zoeken/${slugify(searchQuery.trim())}`)
     }
   }
 

@@ -8,9 +8,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const allParties = await prisma.party.findMany()
   const totalParties = allParties.length
   
-  // Get all cached search results grouped by query
+  // Get all cached search results grouped by slug
   const cachedSearches = await prisma.searchResult.groupBy({
-    by: ['query'],
+    by: ['slug'],
     _count: {
       partyId: true,
     },
@@ -23,16 +23,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   })
   
-  // Get the most recent update date for each fully cached query
-  const queriesWithDates = await Promise.all(
+  // Get the most recent update date for each fully cached slug
+  const slugsWithDates = await Promise.all(
     cachedSearches.map(async (search) => {
       const mostRecent = await prisma.searchResult.findFirst({
-        where: { query: search.query },
+        where: { slug: search.slug },
         orderBy: { createdAt: 'desc' },
         select: { createdAt: true },
       })
       return {
-        query: search.query,
+        slug: search.slug,
         lastModified: mostRecent?.createdAt || new Date(),
       }
     })
@@ -48,8 +48,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     // Search results pages
-    ...queriesWithDates.map(({ query, lastModified }) => ({
-      url: `${baseUrl}/search?q=${encodeURIComponent(query).replace(/%20/g, '+')}`,
+    ...slugsWithDates.map(({ slug, lastModified }) => ({
+      url: `${baseUrl}/zoeken/${slug}`,
       lastModified,
       changeFrequency: 'weekly' as const,
       priority: 0.8,

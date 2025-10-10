@@ -4,6 +4,7 @@ import { embed, generateText } from 'ai'
 import { prisma } from '@/lib/prisma-edge'
 import { cleanQuery, validateQuery } from '@/lib/search-guardrails'
 import { getCachedSearchResults } from '@/lib/search-cache'
+import { slugify } from '@/lib/slugify'
 
 /**
  * Parse markdown format to positions structure
@@ -327,6 +328,7 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
     await prisma.searchResult.create({
       data: {
         query,
+        slug: slugify(query),
         partyId: party.id,
         summary: parsedResponse.summary,
         positions: {

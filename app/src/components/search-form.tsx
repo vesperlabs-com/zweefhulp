@@ -2,18 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { slugify } from "@/lib/slugify";
 
 export function SearchForm() {
   const [query, setQuery] = useState("");
   const router = useRouter();
 
-  // Encode query with + for spaces (like Google)
-  const encodeQuery = (q: string) => encodeURIComponent(q).replace(/%20/g, "+");
-
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/search?q=${encodeQuery(query.trim())}`);
+      router.push(`/zoeken/${slugify(query.trim())}`);
     }
   };
 

@@ -56,6 +56,7 @@ model Document {
 model SearchResult {
   id        String     @id @default(cuid())
   query     String
+  slug      String     @default("")
   partyId   String
   party     Party      @relation(fields: [partyId], references: [id], onDelete: Cascade)
   summary   String     @default("")
@@ -66,6 +67,7 @@ model SearchResult {
   
   @@unique([query, partyId])
   @@index([query])
+  @@index([slug])
   @@index([partyId])
 }
 
