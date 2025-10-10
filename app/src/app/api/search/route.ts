@@ -383,7 +383,7 @@ export async function GET(request: NextRequest) {
     
     if (cachedResults) {
       // All parties are cached, return immediately without validation
-      return NextResponse.json(cachedResults)
+      return NextResponse.json({ parties: cachedResults.parties, query: cachedResults.query })
     }
 
     // Not fully cached, validate the query before running expensive LLM operations
@@ -430,8 +430,8 @@ export async function GET(request: NextRequest) {
       )
     )
 
-    // Return all results
-    return NextResponse.json({ parties: results })
+    // Return all results with the query
+    return NextResponse.json({ parties: results, query })
 
   } catch (error) {
     console.error('Search error:', error)

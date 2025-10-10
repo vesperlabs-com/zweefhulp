@@ -46,11 +46,14 @@ export async function generateMetadata({
 }
 
 export default async function SearchPage({ 
-  params 
+  params,
+  searchParams
 }: { 
-  params: Promise<{ slug: string }> 
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ q?: string }>
 }) {
   const { slug } = await params
+  const { q } = await searchParams
 
   // If no slug, redirect to homepage
   if (!slug) {
@@ -65,10 +68,12 @@ export default async function SearchPage({
     return <SearchPageSSR results={cachedResults} query={cachedResults.query} />
   }
 
-  // Otherwise, render client-side with loading (will use deslugified query as fallback)
+  // Otherwise, render client-side with loading
+  // Pass the query parameter if present, otherwise fallback to deslugified slug
+  const queryToUse = q || deslugify(slug)
   return (
     <Suspense fallback={<div>Laden...</div>}>
-      <SearchPageClient />
+      <SearchPageClient initialQuery={queryToUse} />
     </Suspense>
   )
 }

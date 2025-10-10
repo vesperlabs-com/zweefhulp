@@ -11,7 +11,8 @@ export function SearchForm() {
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/zoeken/${slugify(query.trim())}`);
+      const trimmedQuery = query.trim();
+      router.push(`/zoeken/${slugify(trimmedQuery)}?q=${encodeURIComponent(trimmedQuery)}`);
     }
   };
 

@@ -28,6 +28,7 @@ type PartyResult = {
 
 type SearchResults = {
   parties: PartyResult[]
+  query?: string
 }
 
 const LOADING_MESSAGES = [
@@ -49,13 +50,17 @@ const LOADING_MESSAGES = [
   'Peilingen aan het negeren...',
 ]
 
-export default function SearchPageClient() {
+type SearchPageClientProps = {
+  initialQuery: string
+}
+
+export default function SearchPageClient({ initialQuery }: SearchPageClientProps) {
   const router = useRouter()
   const params = useParams()
   const slug = (params?.slug as string) || ''
-  const query = deslugify(slug)
   
-  const [searchQuery, setSearchQuery] = useState(query)
+  const [query, setQuery] = useState(initialQuery)
+  const [searchQuery, setSearchQuery] = useState(initialQuery)
   const [results, setResults] = useState<SearchResults | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -63,10 +68,15 @@ export default function SearchPageClient() {
   const [sortMode, setSortMode] = useState<'relevance' | 'alphabetical'>('relevance')
 
   useEffect(() => {
-    if (slug) {
-      fetchResults(query)
+    if (slug && initialQuery) {
+      // Clean up URL by removing query parameter if present
+      if (typeof window !== 'undefined' && window.location.search.includes('q=')) {
+        window.history.replaceState({}, '', `/zoeken/${slug}`)
+      }
+      
+      fetchResults(initialQuery)
     }
-  }, [slug, query])
+  }, [slug, initialQuery])
 
   const fetchResults = async (q: string) => {
     setLoading(true)
@@ -91,6 +101,11 @@ export default function SearchPageClient() {
       }
       const data = await response.json()
       setResults(data)
+      // Update query with the actual query from the API response
+      if (data.query) {
+        setQuery(data.query)
+        setSearchQuery(data.query)
+      }
     } catch (err) {
       setError(JSON.stringify({ error: 'Er is iets misgegaan' }))
     } finally {
@@ -102,7 +117,8 @@ export default function SearchPageClient() {
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/zoeken/${slugify(searchQuery.trim())}`)
+      const trimmedQuery = searchQuery.trim();
+      router.push(`/zoeken/${slugify(trimmedQuery)}?q=${encodeURIComponent(trimmedQuery)}`)
     }
   }
 

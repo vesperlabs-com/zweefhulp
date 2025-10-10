@@ -28,6 +28,7 @@ type PartyResult = {
 
 type SearchResults = {
   parties: PartyResult[]
+  query?: string
 }
 
 type SearchPageWrapperProps = {
@@ -44,7 +45,8 @@ export default function SearchPageWrapper({ results, query, initialFavorites }: 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/zoeken/${slugify(searchQuery.trim())}`)
+      const trimmedQuery = searchQuery.trim();
+      router.push(`/zoeken/${slugify(trimmedQuery)}?q=${encodeURIComponent(trimmedQuery)}`)
     }
   }
 
