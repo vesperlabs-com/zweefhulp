@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, FormEvent } from 'react'
+import { useState, useEffect, useLayoutEffect, FormEvent } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import SearchResultsDisplay from '@/components/search-results-display'
@@ -52,9 +52,10 @@ const LOADING_MESSAGES = [
 
 type SearchPageClientProps = {
   initialQuery: string
+  shouldCleanUrl?: boolean
 }
 
-export default function SearchPageClient({ initialQuery }: SearchPageClientProps) {
+export default function SearchPageClient({ initialQuery, shouldCleanUrl }: SearchPageClientProps) {
   const router = useRouter()
   const params = useParams()
   const slug = (params?.slug as string) || ''
@@ -67,13 +68,15 @@ export default function SearchPageClient({ initialQuery }: SearchPageClientProps
   const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0])
   const [sortMode, setSortMode] = useState<'relevance' | 'alphabetical'>('relevance')
 
+  // Clean up URL before first render to avoid showing query parameter
+  useLayoutEffect(() => {
+    if (shouldCleanUrl && typeof window !== 'undefined') {
+      window.history.replaceState({}, '', `/zoeken/${slug}`)
+    }
+  }, [slug, shouldCleanUrl])
+
   useEffect(() => {
     if (slug && initialQuery) {
-      // Clean up URL by removing query parameter if present
-      if (typeof window !== 'undefined' && window.location.search.includes('q=')) {
-        window.history.replaceState({}, '', `/zoeken/${slug}`)
-      }
-      
       fetchResults(initialQuery)
     }
   }, [slug, initialQuery])

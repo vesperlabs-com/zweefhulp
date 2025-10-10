@@ -65,15 +65,19 @@ export default async function SearchPage({
 
   // If fully cached, render server-side with original query
   if (cachedResults) {
+    // If there's a query parameter, redirect to clean URL (cached results don't need it)
+    if (q) {
+      redirect(`/zoeken/${slug}`)
+    }
     return <SearchPageSSR results={cachedResults} query={cachedResults.query} />
   }
 
-  // Otherwise, render client-side with loading
-  // Pass the query parameter if present, otherwise fallback to deslugified slug
+  // If we have a query parameter, we need to pass it to the client
+  // but clean up the URL on the client side
   const queryToUse = q || deslugify(slug)
   return (
     <Suspense fallback={<div>Laden...</div>}>
-      <SearchPageClient initialQuery={queryToUse} />
+      <SearchPageClient initialQuery={queryToUse} shouldCleanUrl={!!q} />
     </Suspense>
   )
 }
