@@ -12,7 +12,7 @@ export function SearchForm() {
     e.preventDefault();
     if (query.trim()) {
       const trimmedQuery = query.trim();
-      router.push(`/zoeken/${slugify(trimmedQuery)}?q=${encodeURIComponent(trimmedQuery)}`);
+      router.push(`/zoeken/${slugify(trimmedQuery)}`);
     }
   };
 
