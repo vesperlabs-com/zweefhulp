@@ -37,6 +37,7 @@ export default function Home() {
               "gaza",
               "normen en waarden",
               "startups",
+              "AI",
               "asielzoekers",
               "zorgakkoord",
               "europa",
