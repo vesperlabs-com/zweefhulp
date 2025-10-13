@@ -27,8 +27,10 @@ type SearchResults = {
 }
 
 /**
- * Check if all parties have cached results for a given query
- * and return those results if they exist
+ * Check if all parties have cached results for a given query (or its slug)
+ * and return those results if they exist.
+ * If results exist under the same slug but different query text,
+ * use the original query text to maintain consistency.
  */
 export async function getCachedSearchResults(
   query: string
@@ -42,9 +44,20 @@ export async function getCachedSearchResults(
     return null
   }
 
-  // Fetch all cached results for this query
+  const querySlug = slugify(query)
+
+  // First, check if there are any existing results for this slug
+  const existingResult = await prisma.searchResult.findFirst({
+    where: { slug: querySlug },
+    select: { query: true }
+  })
+
+  // Use the original query if it exists, otherwise use the provided query
+  const normalizedQuery = existingResult?.query || query
+
+  // Fetch all cached results for the normalized query
   const cachedResults = await prisma.searchResult.findMany({
-    where: { query },
+    where: { query: normalizedQuery },
     include: {
       party: true,
       positions: {
@@ -100,7 +113,7 @@ export async function getCachedSearchResults(
     }
   })
 
-  return { parties, query }
+  return { parties, query: normalizedQuery }
 }
 
 /**

@@ -121,11 +121,26 @@ async function analyzeParty(
     }
   }
 
-  // Check cache first
+  const querySlug = slugify(query)
+
+  // First, check if there's any existing result for this slug and party
+  // to get the original query text
+  const existingResult = await prisma.searchResult.findFirst({
+    where: {
+      slug: querySlug,
+      partyId: party.id
+    },
+    select: { query: true }
+  })
+
+  // Use the original query if it exists, otherwise use the provided query
+  const normalizedQuery = existingResult?.query || query
+
+  // Check cache for this party using the normalized query
   const cachedResult = await prisma.searchResult.findUnique({
     where: {
       query_partyId: {
-        query,
+        query: normalizedQuery,
         partyId: party.id
       }
     },
@@ -331,12 +346,12 @@ Antwoord ALLEEN met markdown, geen extra tekst.`
     0
   )
 
-  // Save to cache
+  // Save to cache using the normalized query
   try {
     await prisma.searchResult.create({
       data: {
-        query,
-        slug: slugify(query),
+        query: normalizedQuery,
+        slug: querySlug,
         partyId: party.id,
         summary: parsedResponse.summary,
         positions: {
