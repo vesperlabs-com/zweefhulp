@@ -123,12 +123,11 @@ async function analyzeParty(
 
   const querySlug = slugify(query)
 
-  // First, check if there's any existing result for this slug and party
-  // to get the original query text
+  // First, check if there's ANY existing result for this slug (across all parties)
+  // to get the original query text and maintain consistency
   const existingResult = await prisma.searchResult.findFirst({
     where: {
-      slug: querySlug,
-      partyId: party.id
+      slug: querySlug
     },
     select: { query: true }
   })
