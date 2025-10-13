@@ -69,12 +69,19 @@ function parseMarkdownToPositions(markdown: string): {
       const line = lines[i].trim()
       if (!line.startsWith('-')) continue
 
-      // Match: - "quote text" (pagina X)
-      const quoteMatch = line.match(/^-\s*"([^"]+)"\s*\(pagina\s+(\d+)\)/)
+      // Match: - "quote text" (pagina X) or (pagina X/Y)
+      // If page range is given (e.g., 46/47), use the first page number
+      const quoteMatch = line.match(/^-\s*"([^"]+)"\s*\(pagina\s+([\d/]+)\)/)
       if (quoteMatch) {
+        // Extract first page number from range (e.g., "46/47" -> 46)
+        const pageStr = quoteMatch[2]
+        const firstPage = pageStr.includes('/') 
+          ? parseInt(pageStr.split('/')[0], 10)
+          : parseInt(pageStr, 10)
+        
         quotes.push({
           text: quoteMatch[1].trim(),
-          page: parseInt(quoteMatch[2], 10)
+          page: firstPage
         })
       }
     }
@@ -247,7 +254,8 @@ ELK STANDPUNT HEEFT:
 
 3. **Quotes (bulletlijst)**: VERBATIM bewijs
    - Elk citaat exact uit het programma (max 1-2 zinnen)
-   - Formaat: - "exacte tekst" (pagina X)
+   - Formaat: - "exacte tekst" (pagina X) waar X het paginanummer is
+   - Gebruik het EERSTE paginanummer waar de quote voorkomt (geen ranges zoals 46/47)
    - GEEN parafrase of interpretatie!
    - Alleen quotes die dit specifieke standpunt ondersteunen
 
