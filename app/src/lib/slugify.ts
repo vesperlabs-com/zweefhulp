@@ -26,13 +26,12 @@ export function slugify(query: string): string {
  * Best-effort conversion of a slug back to a readable query
  * This is a fallback for when the original query is not in the database
  * Examples:
- *   "israel" → "Israel"
- *   "climate-change" → "Climate change"
+ *   "israel" → "israel"
+ *   "climate-change" → "climate change"
  */
 export function deslugify(slug: string): string {
   return slug
     .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
 }
 
