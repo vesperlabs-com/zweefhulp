@@ -12,7 +12,8 @@
     "lint": "biome check",
     "format": "biome format --write",
     "postinstall": "prisma generate",
-    "count-pages": "tsx scripts/count-pages.ts"
+    "count-pages": "tsx scripts/count-pages.ts",
+    "reprocess-party": "tsx scripts/reprocess-party.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",

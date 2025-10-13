@@ -106,7 +106,7 @@ export const PARTIES: Record<string, PartyMetadata> = {
     website: 'https://groenlinks-pvda.nl',
     logo: 'logo_glpvda.jpg',
     program: {
-      fileName: 'Conceptverkiezingsprogramma-GroenLinks-PvdA-2025.pdf',
+      fileName: 'GroenLinks-PvdA-Verkiezingsprogramma-2025.pdf',
       year: 2025
     }
   },
