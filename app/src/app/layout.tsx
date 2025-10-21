@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Barlow_Condensed } from "next/font/google";
+import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
 
 const inter = Inter({
@@ -60,6 +61,7 @@ export default function RootLayout({
         className={`${inter.variable} ${barlowCondensed.variable} antialiased`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );
