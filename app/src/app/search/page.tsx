@@ -23,3 +23,4 @@ export default async function SearchRedirect({
   redirect(`/zoeken/${slug}`)
 }
 
+

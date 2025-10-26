@@ -76,7 +76,7 @@ export const PARTIES: Record<string, PartyMetadata> = {
     website: 'https://d66.nl',
     logo: 'logo_d66.jpg',
     program: {
-      fileName: 'D66-Uitvoeringsprogramma-2025-2030.pdf',
+      fileName: 'D66-Verkiezingsprogramma-2025-2030-2.pdf',
       year: 2025
     }
   },
