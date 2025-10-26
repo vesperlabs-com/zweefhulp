@@ -76,7 +76,7 @@ export const PARTIES: Record<string, PartyMetadata> = {
     website: 'https://d66.nl',
     logo: 'logo_d66.jpg',
     program: {
-      fileName: 'D66-Concept-verkiezingsprogramma-2025-2030.pdf',
+      fileName: 'D66-Uitvoeringsprogramma-2025-2030.pdf',
       year: 2025
     }
   },
@@ -166,7 +166,7 @@ export const PARTIES: Record<string, PartyMetadata> = {
     website: 'https://www.sp.nl',
     logo: 'logo_sp.jpg',
     program: {
-      fileName: 'SP_Concept_Verkiezingsprogramma.pdf',
+      fileName: 'SP-verkiezingsprogramma-TK2025.pdf',
       year: 2025
     }
   },
