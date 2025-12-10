@@ -27,7 +27,7 @@
     "@vercel/analytics": "^1.5.0",
     "ai": "^4.1.10",
     "dotenv": "^17.2.3",
-    "next": "15.5.4",
+    "next": "15.5.7",
     "pdf-parse": "^2.2.1",
     "pdfjs-dist": "^4.4.168",
     "prisma": "^6.16.3",
