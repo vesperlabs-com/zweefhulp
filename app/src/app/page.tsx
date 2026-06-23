@@ -65,19 +65,19 @@ export default function Home() {
             <p>
               Een initiatief van{" "}
               <a
-                href="https://vesperlabs.com"
+                href="https://klime.com"
                 className="text-blue-600 hover:text-blue-700"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Vesper Labs
+                Klime
               </a>
             </p>
             <div className="flex gap-3">
               <span>Let op: Verifieer altijd AI-resultaten</span>
               <span>•</span>
               <a
-                href="https://github.com/vesperlabs-com/zweefhulp"
+                href="https://github.com/klimeapp/zweefhulp"
                 className="text-blue-600 hover:text-blue-700"
                 target="_blank"
                 rel="noopener noreferrer"

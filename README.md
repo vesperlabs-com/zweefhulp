@@ -94,7 +94,7 @@ De gevonden chunks worden geanalyseerd door een LLM om gestructureerde standpunt
 
 ```bash
 # Clone de repository
-git clone https://github.com/vesperlabs-com/zweefhulp.git
+git clone https://github.com/klimeapp/zweefhulp.git
 cd zweefhulp/app
 
 # Installeer dependencies
@@ -131,7 +131,7 @@ pnpm format   # Format code met Biome
 
 ## Credits
 
-Een initiatief van [Vesper Labs](https://vesperlabs.com):
+Een initiatief van [Klime](https://klime.com):
 
 - [Robert Gaal](https://gaal.co)
 - [Stefan Borsje](https://stefanborsje.com/)
